@@ -1,728 +1,116 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>denizkokan0-dot / flappy</title>
-  <style>
-    :root {
-      --bg: #0d1117;
-      --surface: #161b22;
-      --border: #30363d;
-      --border-subtle: #21262d;
-      --text: #e6edf3;
-      --text-muted: #7d8590;
-      --accent: #d29922;
-      --success: #3fb950;
-      --danger: #f85149;
-    }
-    [data-theme="paper"] {
-      --bg: #f6f5f2;
-      --surface: #eceae4;
-      --border: #d0cdc4;
-      --border-subtle: #e2dfd7;
-      --text: #1c1e21;
-      --text-muted: #6e7278;
-      --accent: #b5651d;
-      --success: #2da44e;
-      --danger: #cf222e;
-    }
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-      user-select: none;
-      -webkit-user-select: none;
-    }
-    body {
-      background-color: var(--bg);
-      color: var(--text);
-      font-family: -apple-system, BlinkMacSystemFont, "Inter", "Segoe UI", Helvetica, Arial, sans-serif;
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      padding: 20px;
-      transition: background-color 0.2s ease, color 0.2s ease;
-    }
-    .shell {
-      width: 100%;
-      max-width: 760px;
-      border: 1px solid var(--border);
-      border-radius: 10px;
-      background: var(--bg);
-      overflow: hidden;
-      box-shadow: 0 16px 48px rgba(0, 0, 0, 0.35);
-    }
-    .topbar {
-      height: 44px;
-      padding: 0 16px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      border-bottom: 1px solid var(--border-subtle);
-      font-family: "JetBrains Mono", "SFMono-Regular", Consolas, monospace;
-      font-size: 12px;
-    }
-    .brand {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      color: var(--text-muted);
-      text-decoration: none;
-    }
-    .brand strong {
-      color: var(--text);
-      font-weight: 600;
-    }
-    .brand:hover strong {
-      text-decoration: underline;
-    }
-    .telemetry {
-      display: flex;
-      align-items: center;
-      gap: 16px;
-      color: var(--text-muted);
-    }
-    .telemetry span b {
-      color: var(--text);
-      font-weight: 600;
-    }
-    .toolbar {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-    }
-    .btn {
-      background: var(--surface);
-      color: var(--text);
-      border: 1px solid var(--border);
-      border-radius: 5px;
-      padding: 4px 9px;
-      font-family: inherit;
-      font-size: 11px;
-      cursor: pointer;
-      transition: border-color 0.15s;
-    }
-    .btn:hover {
-      border-color: var(--text-muted);
-    }
-    .btn.active {
-      border-color: var(--text);
-    }
-    .viewport {
-      position: relative;
-      width: 100%;
-      aspect-ratio: 760 / 420;
-      background: var(--bg);
-    }
-    canvas {
-      width: 100%;
-      height: 100%;
-      display: block;
-      cursor: pointer;
-      touch-action: manipulation;
-    }
-    .statusbar {
-      height: 34px;
-      padding: 0 16px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      border-top: 1px solid var(--border-subtle);
-      font-family: "JetBrains Mono", "SFMono-Regular", Consolas, monospace;
-      font-size: 11px;
-      color: var(--text-muted);
-    }
-    .keys kbd {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 3px;
-      padding: 1px 5px;
-      font-size: 10px;
-      color: var(--text);
-    }
-    @media (max-width: 600px) {
-      .viewport {
-        aspect-ratio: 4 / 5;
-      }
-      .statusbar .right-meta {
-        display: none;
-      }
-    }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>denizkokan0-dot / flappy</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;user-select:none;-webkit-user-select:none}
+body{min-height:100vh;display:flex;align-items:center;justify-content:center;background:#0d1117;font-family:"Segoe UI",Arial,sans-serif;padding:16px}
+.shell{width:100%;max-width:880px;border-radius:14px;overflow:hidden;border:1px solid #30363d;box-shadow:0 20px 60px rgba(0,0,0,.5);background:#161b22}
+.bar{display:flex;justify-content:space-between;align-items:center;padding:8px 14px;color:#8b949e;font-size:12px;font-family:Consolas,monospace}
+.bar a{color:#e6edf3;text-decoration:none;font-weight:600}
+.bar button{background:#21262d;color:#e6edf3;border:1px solid #30363d;border-radius:6px;padding:3px 9px;margin-left:6px;cursor:pointer;font:inherit}
+.bar button:hover{border-color:#8b949e}
+canvas{display:block;width:100%;aspect-ratio:880/400;cursor:pointer;touch-action:manipulation}
+</style>
 </head>
 <body>
-  <div class="shell">
-    <div class="topbar">
-      <a class="brand" href="https://github.com/denizkokan0-dot" target="_top">
-        <span>denizkokan0-dot</span>
-        <span>/</span>
-        <strong>flappy</strong>
-      </a>
-
-      <div class="telemetry">
-        <span>SCORE <b id="scoreVal">00</b></span>
-        <span>BEST <b id="bestVal">00</b></span>
-      </div>
-
-      <div class="toolbar">
-        <button class="btn" id="modeBtn" title="Switch speed mode">MODE: NORMAL</button>
-        <button class="btn" id="soundBtn" title="Toggle audio (M)">AUDIO: ON</button>
-        <button class="btn" id="themeBtn" title="Toggle theme (T)">THEME</button>
-      </div>
-    </div>
-
-    <div class="viewport">
-      <canvas id="stage"></canvas>
-    </div>
-
-    <div class="statusbar">
-      <div class="keys">
-        <kbd>SPACE</kbd> / <kbd>CLICK</kbd> Jump &nbsp;·&nbsp; <kbd>P</kbd> Pause &nbsp;·&nbsp; <kbd>M</kbd> Mute &nbsp;·&nbsp; <kbd>T</kbd> Theme
-      </div>
-      <div class="right-meta" id="fpsMeta">60 FPS · READY</div>
-    </div>
-  </div>
-
-  <script>
-    const canvas = document.getElementById('stage');
-    const ctx = canvas.getContext('2d');
-    const scoreEl = document.getElementById('scoreVal');
-    const bestEl = document.getElementById('bestVal');
-    const modeBtn = document.getElementById('modeBtn');
-    const soundBtn = document.getElementById('soundBtn');
-    const themeBtn = document.getElementById('themeBtn');
-    const fpsMeta = document.getElementById('fpsMeta');
-
-    // Logical dimensions
-    const LOGICAL_W = 760;
-    const LOGICAL_H = 420;
-
-    function resizeCanvas() {
-      const dpr = window.devicePixelRatio || 1;
-      canvas.width = LOGICAL_W * dpr;
-      canvas.height = LOGICAL_H * dpr;
-      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-    }
-    resizeCanvas();
-    window.addEventListener('resize', resizeCanvas);
-
-    // Theme palettes
-    const PALETTES = {
-      dark: {
-        bg: '#0d1117',
-        grid: '#161c24',
-        horizon: '#21262d',
-        cityFill: '#11161d',
-        cityStroke: '#1f2631',
-        pillarFill: '#1c232e',
-        pillarCap: '#283140',
-        pillarStroke: '#30363d',
-        guide: '#21262d',
-        birdFill: '#e6edf3',
-        birdStroke: '#0d1117',
-        wing: '#8b949e',
-        accent: '#d29922',
-        text: '#e6edf3',
-        muted: '#7d8590',
-        overlay: 'rgba(13, 17, 23, 0.78)',
-        card: '#161b22'
-      },
-      paper: {
-        bg: '#f6f5f2',
-        grid: '#eae8e1',
-        horizon: '#dcd9cf',
-        cityFill: '#efede7',
-        cityStroke: '#dcd9cf',
-        pillarFill: '#e2dfd7',
-        pillarCap: '#d4d0c5',
-        pillarStroke: '#b8b3a6',
-        guide: '#dcd9cf',
-        birdFill: '#1c1e21',
-        birdStroke: '#f6f5f2',
-        wing: '#6e7278',
-        accent: '#b5651d',
-        text: '#1c1e21',
-        muted: '#6e7278',
-        overlay: 'rgba(246, 245, 242, 0.82)',
-        card: '#eceae4'
-      }
-    };
-
-    let currentTheme = localStorage.getItem('flappy_theme') || 'dark';
-    document.documentElement.setAttribute('data-theme', currentTheme);
-
-    // Sound Synthesizer (Subtle, minimal clicks/tones)
-    const AudioCtx = window.AudioContext || window.webkitAudioContext;
-    let audioCtx = null;
-    let soundEnabled = true;
-
-    function playTone(type) {
-      if (!soundEnabled) return;
-      try {
-        if (!audioCtx) audioCtx = new AudioCtx();
-        if (audioCtx.state === 'suspended') audioCtx.resume();
-        const osc = audioCtx.createOscillator();
-        const gain = audioCtx.createGain();
-        osc.connect(gain);
-        gain.connect(audioCtx.destination);
-        const now = audioCtx.currentTime;
-
-        if (type === 'jump') {
-          osc.type = 'sine';
-          osc.frequency.setValueAtTime(240, now);
-          osc.frequency.exponentialRampToValueAtTime(380, now + 0.065);
-          gain.gain.setValueAtTime(0.06, now);
-          gain.gain.exponentialRampToValueAtTime(0.001, now + 0.065);
-          osc.start(now);
-          osc.stop(now + 0.065);
-        } else if (type === 'point') {
-          osc.type = 'sine';
-          osc.frequency.setValueAtTime(587.33, now); // D5
-          osc.frequency.setValueAtTime(880, now + 0.055); // A5
-          gain.gain.setValueAtTime(0.07, now);
-          gain.gain.exponentialRampToValueAtTime(0.001, now + 0.16);
-          osc.start(now);
-          osc.stop(now + 0.16);
-        } else if (type === 'crash') {
-          osc.type = 'triangle';
-          osc.frequency.setValueAtTime(140, now);
-          osc.frequency.exponentialRampToValueAtTime(45, now + 0.18);
-          gain.gain.setValueAtTime(0.12, now);
-          gain.gain.exponentialRampToValueAtTime(0.001, now + 0.18);
-          osc.start(now);
-          osc.stop(now + 0.18);
-        }
-      } catch (_) {}
-    }
-
-    // Modes
-    const MODES = {
-      NORMAL: { speed: 215, gap: 118, gravity: 980, jump: -325, interval: 240 },
-      FAST:   { speed: 285, gap: 110, gravity: 1120, jump: -355, interval: 230 }
-    };
-    let modeKey = 'NORMAL';
-
-    // Game State
-    let state = 'IDLE'; // IDLE, RUNNING, PAUSED, OVER
-    let score = 0;
-    let best = parseInt(localStorage.getItem('deniz_flappy_clean_best') || '0', 10);
-    let shakeTime = 0;
-    let scrollX = 0;
-
-    function fmt(n) {
-      return String(n).padStart(2, '0');
-    }
-    bestEl.textContent = fmt(best);
-
-    const glider = {
-      x: 180,
-      y: LOGICAL_H / 2,
-      vy: 0,
-      w: 28,
-      h: 16,
-      angle: 0,
-      trail: [],
-      reset() {
-        this.y = LOGICAL_H / 2;
-        this.vy = 0;
-        this.angle = 0;
-        this.trail = [];
-      },
-      jump() {
-        const cfg = MODES[modeKey];
-        this.vy = cfg.jump;
-        playTone('jump');
-        for (let i = 0; i < 4; i++) {
-          particles.push({
-            x: this.x - 10,
-            y: this.y + (Math.random() - 0.5) * 6,
-            vx: -60 - Math.random() * 50,
-            vy: (Math.random() - 0.5) * 40,
-            life: 1
-          });
-        }
-      },
-      update(dt, time) {
-        if (state === 'IDLE') {
-          this.y = LOGICAL_H / 2 + Math.sin(time * 3.2) * 7;
-          this.angle = Math.cos(time * 3.2) * 0.08;
-          return;
-        }
-        const cfg = MODES[modeKey];
-        this.vy += cfg.gravity * dt;
-        this.y += this.vy * dt;
-
-        const targetAngle = Math.max(-0.42, Math.min(0.85, this.vy / 480));
-        this.angle += (targetAngle - this.angle) * Math.min(1, dt * 14);
-
-        // Record wake trail
-        this.trail.unshift({ x: this.x - 10, y: this.y });
-        if (this.trail.length > 18) this.trail.pop();
-        for (let i = 0; i < this.trail.length; i++) {
-          this.trail[i].x -= cfg.speed * dt;
-        }
-
-        // Floor / ceiling collision
-        const r = 7;
-        if (this.y + r >= LOGICAL_H - 1) {
-          this.y = LOGICAL_H - 1 - r;
-          endGame();
-        } else if (this.y - r <= 1) {
-          this.y = 1 + r;
-          this.vy = 0;
-        }
-      },
-      draw(pal, time) {
-        // Draw wake trail
-        for (let i = 0; i < this.trail.length; i += 3) {
-          const pt = this.trail[i];
-          const alpha = (1 - i / this.trail.length) * 0.35;
-          ctx.fillStyle = pal.muted;
-          ctx.globalAlpha = alpha;
-          ctx.beginPath();
-          ctx.arc(pt.x, pt.y, 1.6, 0, Math.PI * 2);
-          ctx.fill();
-        }
-        ctx.globalAlpha = 1;
-
-        ctx.save();
-        ctx.translate(this.x, this.y);
-        ctx.rotate(this.angle);
-
-        // Capsule body
-        ctx.fillStyle = pal.birdFill;
-        ctx.strokeStyle = pal.birdStroke;
-        ctx.lineWidth = 1.5;
-        ctx.beginPath();
-        ctx.roundRect(-14, -8, 26, 16, 8);
-        ctx.fill();
-        ctx.stroke();
-
-        // Wing
-        const wingY = state === 'OVER' ? 0 : Math.sin(time * 22) * 2.2;
-        ctx.fillStyle = pal.wing;
-        ctx.beginPath();
-        ctx.roundRect(-9, -2 + wingY, 11, 5.5, 2.75);
-        ctx.fill();
-
-        // Eye
-        ctx.fillStyle = pal.birdStroke;
-        ctx.beginPath();
-        ctx.arc(5, -2, 1.8, 0, Math.PI * 2);
-        ctx.fill();
-
-        // Beak
-        ctx.fillStyle = pal.accent;
-        ctx.beginPath();
-        ctx.moveTo(12, -3);
-        ctx.lineTo(18, 0);
-        ctx.lineTo(12, 3);
-        ctx.closePath();
-        ctx.fill();
-
-        ctx.restore();
-      }
-    };
-
-    const pillars = [];
-    const particles = [];
-    const PILLAR_W = 46;
-
-    function spawnPillar(startX) {
-      const cfg = MODES[modeKey];
-      const margin = 52;
-      const maxTop = LOGICAL_H - margin - cfg.gap;
-      const topH = Math.floor(margin + Math.random() * (maxTop - margin));
-      pillars.push({
-        x: startX,
-        topH,
-        gap: cfg.gap,
-        passed: false
-      });
-    }
-
-    function startNewGame() {
-      pillars.length = 0;
-      particles.length = 0;
-      score = 0;
-      scoreEl.textContent = '00';
-      glider.reset();
-      const cfg = MODES[modeKey];
-      for (let i = 0; i < 4; i++) {
-        spawnPillar(440 + i * cfg.interval);
-      }
-      state = 'RUNNING';
-      fpsMeta.textContent = `60 FPS · ${modeKey}`;
-      glider.jump();
-    }
-
-    function endGame() {
-      if (state === 'OVER') return;
-      state = 'OVER';
-      shakeTime = 0.18;
-      playTone('crash');
-      fpsMeta.textContent = 'TERMINATED · PRESS SPACE';
-      if (score > best) {
-        best = score;
-        localStorage.setItem('deniz_flappy_clean_best', String(best));
-        bestEl.textContent = fmt(best);
-      }
-    }
-
-    function updateWorld(dt) {
-      if (state !== 'RUNNING') return;
-      const cfg = MODES[modeKey];
-      scrollX = (scrollX + cfg.speed * dt) % 40;
-
-      for (let i = pillars.length - 1; i >= 0; i--) {
-        const p = pillars[i];
-        p.x -= cfg.speed * dt;
-
-        // Collision box check (tight, fair hitbox)
-        const bx1 = glider.x - 11;
-        const bx2 = glider.x + 11;
-        const by1 = glider.y - 6;
-        const by2 = glider.y + 6;
-
-        if (bx2 > p.x && bx1 < p.x + PILLAR_W) {
-          if (by1 < p.topH || by2 > p.topH + p.gap) {
-            endGame();
-          }
-        }
-
-        // Score gate
-        if (!p.passed && p.x + PILLAR_W < glider.x) {
-          p.passed = true;
-          score++;
-          scoreEl.textContent = fmt(score);
-          playTone('point');
-        }
-
-        if (p.x + PILLAR_W < -40) {
-          pillars.splice(i, 1);
-          const lastX = pillars.length ? pillars[pillars.length - 1].x : LOGICAL_W;
-          spawnPillar(lastX + cfg.interval);
-        }
-      }
-
-      for (let i = particles.length - 1; i >= 0; i--) {
-        const pt = particles[i];
-        pt.x += pt.vx * dt;
-        pt.y += pt.vy * dt;
-        pt.life -= dt * 2.6;
-        if (pt.life <= 0) particles.splice(i, 1);
-      }
-    }
-
-    function drawStage(pal, time) {
-      ctx.save();
-      if (shakeTime > 0) {
-        const mag = shakeTime * 22;
-        ctx.translate((Math.random() - 0.5) * mag, (Math.random() - 0.5) * mag);
-      }
-
-      // Background
-      ctx.fillStyle = pal.bg;
-      ctx.fillRect(0, 0, LOGICAL_W, LOGICAL_H);
-
-      // Architectural Grid
-      ctx.strokeStyle = pal.grid;
-      ctx.lineWidth = 1;
-      ctx.beginPath();
-      for (let x = -scrollX; x < LOGICAL_W; x += 40) {
-        ctx.moveTo(x, 0);
-        ctx.lineTo(x, LOGICAL_H);
-      }
-      for (let y = 0; y < LOGICAL_H; y += 40) {
-        ctx.moveTo(0, y);
-        ctx.lineTo(LOGICAL_W, y);
-      }
-      ctx.stroke();
-
-      // Horizon Line
-      ctx.strokeStyle = pal.horizon;
-      ctx.beginPath();
-      ctx.moveTo(0, LOGICAL_H - 65);
-      ctx.lineTo(LOGICAL_W, LOGICAL_H - 65);
-      ctx.stroke();
-
-      // Pillars
-      pillars.forEach(p => {
-        const botY = p.topH + p.gap;
-        const botH = LOGICAL_H - botY;
-
-        // Dashed gate line
-        ctx.strokeStyle = pal.guide;
-        ctx.setLineDash([3, 3]);
-        ctx.beginPath();
-        ctx.moveTo(p.x + PILLAR_W / 2, p.topH);
-        ctx.lineTo(p.x + PILLAR_W / 2, botY);
-        ctx.stroke();
-        ctx.setLineDash([]);
-
-        // Top column
-        ctx.fillStyle = pal.pillarFill;
-        ctx.strokeStyle = pal.pillarStroke;
-        ctx.lineWidth = 1;
-        ctx.fillRect(p.x, -1, PILLAR_W, p.topH + 1);
-        ctx.strokeRect(p.x, -1, PILLAR_W, p.topH + 1);
-
-        // Top cap
-        ctx.fillStyle = pal.pillarCap;
-        ctx.fillRect(p.x - 3, p.topH - 6, PILLAR_W + 6, 6);
-        ctx.strokeRect(p.x - 3, p.topH - 6, PILLAR_W + 6, 6);
-
-        // Bottom column
-        ctx.fillStyle = pal.pillarFill;
-        ctx.fillRect(p.x, botY, PILLAR_W, botH + 1);
-        ctx.strokeRect(p.x, botY, PILLAR_W, botH + 1);
-
-        // Bottom cap
-        ctx.fillStyle = pal.pillarCap;
-        ctx.fillRect(p.x - 3, botY, PILLAR_W + 6, 6);
-        ctx.strokeRect(p.x - 3, botY, PILLAR_W + 6, 6);
-      });
-
-      // Particles
-      particles.forEach(pt => {
-        ctx.fillStyle = pal.muted;
-        ctx.globalAlpha = Math.max(0, pt.life * 0.6);
-        ctx.beginPath();
-        ctx.arc(pt.x, pt.y, 1.8, 0, Math.PI * 2);
-        ctx.fill();
-      });
-      ctx.globalAlpha = 1;
-
-      // Glider
-      glider.draw(pal, time);
-
-      // Minimal HUD Modal when IDLE, PAUSED, or OVER
-      if (state !== 'RUNNING') {
-        ctx.fillStyle = pal.overlay;
-        ctx.fillRect(0, 0, LOGICAL_W, LOGICAL_H);
-
-        const mw = 320;
-        const mh = 156;
-        const mx = (LOGICAL_W - mw) / 2;
-        const my = (LOGICAL_H - mh) / 2;
-
-        ctx.fillStyle = pal.card;
-        ctx.strokeStyle = pal.pillarStroke;
-        ctx.lineWidth = 1;
-        ctx.beginPath();
-        ctx.roundRect(mx, my, mw, mh, 8);
-        ctx.fill();
-        ctx.stroke();
-
-        ctx.textAlign = 'center';
-        if (state === 'IDLE') {
-          ctx.fillStyle = pal.text;
-          ctx.font = '600 15px -apple-system, BlinkMacSystemFont, "Inter", sans-serif';
-          ctx.fillText('Interactive Flight Simulation', LOGICAL_W / 2, my + 44);
-
-          ctx.fillStyle = pal.muted;
-          ctx.font = '12px "JetBrains Mono", Consolas, monospace';
-          ctx.fillText('Navigate through the structural gaps.', LOGICAL_W / 2, my + 74);
-
-          ctx.fillStyle = pal.text;
-          ctx.font = '500 12px "JetBrains Mono", Consolas, monospace';
-          ctx.fillText('[ Press SPACE or Click to start ]', LOGICAL_W / 2, my + 118);
-        } else if (state === 'PAUSED') {
-          ctx.fillStyle = pal.text;
-          ctx.font = '600 15px -apple-system, BlinkMacSystemFont, "Inter", sans-serif';
-          ctx.fillText('Simulation Paused', LOGICAL_W / 2, my + 58);
-
-          ctx.fillStyle = pal.muted;
-          ctx.font = '12px "JetBrains Mono", Consolas, monospace';
-          ctx.fillText('[ Press P or SPACE to resume ]', LOGICAL_W / 2, my + 102);
-        } else if (state === 'OVER') {
-          ctx.fillStyle = pal.text;
-          ctx.font = '600 15px -apple-system, BlinkMacSystemFont, "Inter", sans-serif';
-          ctx.fillText('Run Terminated', LOGICAL_W / 2, my + 42);
-
-          ctx.fillStyle = pal.muted;
-          ctx.font = '12px "JetBrains Mono", Consolas, monospace';
-          ctx.fillText(`SCORE ${fmt(score)}   ·   BEST ${fmt(best)}`, LOGICAL_W / 2, my + 76);
-
-          ctx.fillStyle = pal.text;
-          ctx.font = '500 12px "JetBrains Mono", Consolas, monospace';
-          ctx.fillText('[ Press SPACE or Click to retry ]', LOGICAL_W / 2, my + 118);
-        }
-      }
-
-      ctx.restore();
-    }
-
-    function triggerPrimaryAction(e) {
-      if (e) e.preventDefault();
-      if (state === 'IDLE' || state === 'OVER') {
-        startNewGame();
-      } else if (state === 'PAUSED') {
-        state = 'RUNNING';
-        fpsMeta.textContent = `60 FPS · ${modeKey}`;
-      } else if (state === 'RUNNING') {
-        glider.jump();
-      }
-    }
-
-    canvas.addEventListener('pointerdown', triggerPrimaryAction);
-
-    window.addEventListener('keydown', e => {
-      if (e.code === 'Space' || e.code === 'ArrowUp' || e.code === 'KeyW') {
-        triggerPrimaryAction(e);
-      } else if (e.code === 'KeyP' || e.code === 'Escape') {
-        if (state === 'RUNNING') {
-          state = 'PAUSED';
-          fpsMeta.textContent = 'PAUSED';
-        } else if (state === 'PAUSED') {
-          state = 'RUNNING';
-          fpsMeta.textContent = `60 FPS · ${modeKey}`;
-        }
-      } else if (e.code === 'KeyM') {
-        soundBtn.click();
-      } else if (e.code === 'KeyT') {
-        themeBtn.click();
-      }
-    });
-
-    modeBtn.addEventListener('click', () => {
-      modeKey = modeKey === 'NORMAL' ? 'FAST' : 'NORMAL';
-      modeBtn.textContent = `MODE: ${modeKey}`;
-      if (state === 'RUNNING') startNewGame();
-    });
-
-    soundBtn.addEventListener('click', () => {
-      soundEnabled = !soundEnabled;
-      soundBtn.textContent = `AUDIO: ${soundEnabled ? 'ON' : 'OFF'}`;
-    });
-
-    themeBtn.addEventListener('click', () => {
-      currentTheme = currentTheme === 'dark' ? 'paper' : 'dark';
-      document.documentElement.setAttribute('data-theme', currentTheme);
-      localStorage.setItem('flappy_theme', currentTheme);
-    });
-
-    let lastTime = performance.now();
-    function frame(now) {
-      const dt = Math.min(0.033, (now - lastTime) / 1000);
-      lastTime = now;
-      const elapsed = now / 1000;
-
-      if (shakeTime > 0) shakeTime = Math.max(0, shakeTime - dt);
-
-      if (state !== 'PAUSED') {
-        glider.update(dt, elapsed);
-        updateWorld(dt);
-      }
-
-      drawStage(PALETTES[currentTheme], elapsed);
-      requestAnimationFrame(frame);
-    }
-
-    requestAnimationFrame(frame);
-  </script>
+<div class="shell">
+<div class="bar"><a href="https://github.com/denizkokan0-dot" target="_top">denizkokan0-dot / flappy</a><span>SPACE / CLICK flap · P pause</span><span><button id="snd">SOUND: ON</button></span></div>
+<canvas id="c"></canvas>
+</div>
+<script>
+const W=880,H=400,GROUND=340,cv=document.getElementById('c'),ctx=cv.getContext('2d');
+const dpr=Math.min(window.devicePixelRatio||1,2);cv.width=W*dpr;cv.height=H*dpr;ctx.scale(dpr,dpr);
+const R=(a,b)=>a+Math.random()*(b-a);
+let best=+localStorage.getItem('flappy_best_v2')||0,sound=true;
+// audio
+let ac;function tone(f1,f2,d,type='sine',v=.07){if(!sound)return;try{ac=ac||new(window.AudioContext||window.webkitAudioContext)();if(ac.state==='suspended')ac.resume();const o=ac.createOscillator(),g=ac.createGain(),t=ac.currentTime;o.type=type;o.frequency.setValueAtTime(f1,t);o.frequency.exponentialRampToValueAtTime(f2,t+d);g.gain.setValueAtTime(v,t);g.gain.exponentialRampToValueAtTime(.001,t+d);o.connect(g);g.connect(ac.destination);o.start(t);o.stop(t+d)}catch(e){}}
+document.getElementById('snd').onclick=e=>{sound=!sound;e.target.textContent='SOUND: '+(sound?'ON':'OFF')};
+// state
+let state='idle',score=0,t=0,bird,pipes,parts,clouds,stars,shake=0,groundX=0,hillA=0,hillB=0,medal='',newBest=false;
+stars=Array.from({length:60},()=>({x:R(0,W),y:R(0,200),r:R(.5,1.6),p:R(0,6)}));
+clouds=Array.from({length:7},()=>({x:R(0,W),y:R(20,170),s:R(.6,1.2),v:R(8,22)}));
+function reset(){bird={x:230,y:H/2-30,vy:0,rot:0,flap:0};pipes=[];parts=[];score=0;newBest=false;nextX=720}
+let nextX;
+function diff(){return Math.min(1,score/40)}
+function speed(){return 150+diff()*90}
+function gapSize(){return 150-diff()*34}
+function addPipe(){const g=gapSize(),m=50,top=R(m,GROUND-m-g);pipes.push({x:nextX,top,gap:g,pass:false,amp:score>12?R(0,28)*Math.min(1,(score-12)/20):0,ph:R(0,6),w:62});nextX+=R(270,320)-diff()*40}
+reset();
+function flap(){if(state==='idle'){state='run';}if(state==='over'){if(t-overT>.45){reset();state='run'}else return}
+if(state==='paused'){state='run';return}
+if(state!=='run')return;bird.vy=-400;bird.flap=1;tone(300,520,.09);for(let i=0;i<5;i++)parts.push({x:bird.x-12,y:bird.y+6,vx:R(-90,-20),vy:R(-30,50),l:1,c:'#fff'})}
+let overT=0;
+function die(){if(state!=='run')return;state='over';overT=t;shake=.35;tone(180,40,.35,'triangle',.14);for(let i=0;i<24;i++)parts.push({x:bird.x,y:bird.y,vx:R(-200,200),vy:R(-260,80),l:1.4,c:Math.random()<.5?'#ffd92e':'#ff7a1a'});
+if(score>best){best=score;newBest=true;localStorage.setItem('flappy_best_v2',best)}
+medal=score>=40?'💎':score>=25?'🥇':score>=15?'🥈':score>=8?'🥉':''}
+function pipeY(p){return p.top+Math.sin(t*1.8+p.ph)*p.amp}
+function update(dt){
+if(state==='paused')return;
+const sp=state==='over'?0:speed();
+groundX=(groundX+sp*dt)%40;hillA=(hillA+sp*.12*dt)%W;hillB=(hillB+sp*.3*dt)%W;
+clouds.forEach(c=>{c.x-=(c.v+sp*.05)*dt;if(c.x<-80){c.x=W+80;c.y=R(20,170)}});
+if(shake>0)shake-=dt;
+parts.forEach(p=>{p.x+=p.vx*dt;p.y+=p.vy*dt;p.vy+=(p.c==='#fff'?0:600)*dt;p.l-=dt*1.6});parts=parts.filter(p=>p.l>0);
+if(state==='idle'){bird.y=H/2-30+Math.sin(t*4)*8;bird.rot=0;return}
+bird.vy+=1250*dt;bird.y+=bird.vy*dt;bird.flap=Math.max(0,bird.flap-dt*4);
+bird.rot+=(Math.max(-.5,Math.min(1.3,bird.vy/520))-bird.rot)*Math.min(1,dt*12);
+if(state==='over'){if(bird.y>GROUND-12){bird.y=GROUND-12;bird.vy=0}return}
+if(bird.y<12){bird.y=12;bird.vy=0}
+if(bird.y>GROUND-12){bird.y=GROUND-12;die();return}
+if(!pipes.length||pipes[pipes.length-1].x<W+40)addPipe();
+for(const p of pipes){p.x-=sp*dt;const ty=pipeY(p);
+if(bird.x+13>p.x&&bird.x-13<p.x+p.w&&(bird.y-10<ty||bird.y+10>ty+p.gap)){die();return}
+if(!p.pass&&p.x+p.w<bird.x){p.pass=true;score++;tone(660,990,.12,'square',.04)}}
+nextX-=sp*dt;pipes=pipes.filter(p=>p.x>-100)}
+// drawing
+function mix(a,b,k){return a.map((v,i)=>Math.round(v+(b[i]-v)*k))}
+const DAY=[[63,180,232],[189,234,245]],DUSK=[[242,132,92],[255,208,138]],NIGHT=[[10,18,56],[42,59,122]];
+function cycle(){const c=((score/10)%4);return c<1?[DAY,DUSK,c]:c<2?[DUSK,NIGHT,c-1]:c<3?[NIGHT,DUSK,c-2]:[DUSK,DAY,c-3]}
+function skyCols(){const [a,b,k]=cycle();return[mix(a[0],b[0],k),mix(a[1],b[1],k)]}
+function nightness(){const [a,b,k]=cycle();const n=x=>x===NIGHT?1:x===DUSK?.35:0;return n(a)+(n(b)-n(a))*k}
+const rgb=a=>`rgb(${a})`;
+function hills(off,y,amp,col,per){ctx.fillStyle=col;ctx.beginPath();ctx.moveTo(0,GROUND);for(let x=0;x<=W;x+=8)ctx.lineTo(x,y+Math.sin((x+off)/per*Math.PI*2)*amp+Math.sin((x+off)/per*Math.PI*5)*amp*.3);ctx.lineTo(W,GROUND);ctx.fill()}
+function cloud(c){ctx.save();ctx.translate(c.x,c.y);ctx.scale(c.s,c.s);ctx.fillStyle='rgba(255,255,255,.88)';ctx.beginPath();[[0,0,26,12],[-20,5,18,9],[22,5,20,9],[6,-9,16,11]].forEach(e=>{ctx.moveTo(e[0]+e[2],e[1]);ctx.ellipse(e[0],e[1],e[2],e[3],0,0,7)});ctx.fill();ctx.restore()}
+function pipeShape(x,y,w,h,capTop){const g=ctx.createLinearGradient(x,0,x+w,0);g.addColorStop(0,'#3f7d14');g.addColorStop(.25,'#9be045');g.addColorStop(.6,'#6cb52a');g.addColorStop(1,'#3a7312');ctx.fillStyle=g;ctx.strokeStyle='#27500c';ctx.lineWidth=2.5;ctx.fillRect(x,y,w,h);ctx.strokeRect(x,y,w,h);const cy=capTop?y:y+h-28;ctx.beginPath();ctx.roundRect(x-5,cy,w+10,28,4);ctx.fill();ctx.stroke()}
+function drawBird(){ctx.save();ctx.translate(bird.x,bird.y);ctx.rotate(bird.rot);ctx.lineJoin='round';ctx.strokeStyle='#5a3b00';ctx.lineWidth=2.5;
+ctx.fillStyle='#f2a900';ctx.beginPath();ctx.moveTo(-14,-2);ctx.lineTo(-24,-6);ctx.lineTo(-22,3);ctx.closePath();ctx.fill();ctx.stroke();
+ctx.fillStyle='#ffd92e';ctx.beginPath();ctx.ellipse(0,0,16,13,0,0,7);ctx.fill();ctx.stroke();
+ctx.fillStyle='#fff3a6';ctx.beginPath();ctx.ellipse(1,6,11,5,0,0,7);ctx.fill();
+const wa=state==='run'||state==='idle'?Math.sin(t*(state==='idle'?14:26)+bird.flap*3)*.6-.1:.3;ctx.save();ctx.translate(-5,2);ctx.rotate(wa);ctx.fillStyle='#fff';ctx.lineWidth=2;ctx.beginPath();ctx.ellipse(1,1,9,5.5,0,0,7);ctx.fill();ctx.stroke();ctx.restore();
+ctx.fillStyle='#fff';ctx.lineWidth=2;ctx.beginPath();ctx.arc(7,-5,5.5,0,7);ctx.fill();ctx.stroke();ctx.fillStyle='#111';ctx.beginPath();ctx.arc(9,-5,2.4,0,7);ctx.fill();
+ctx.fillStyle='#ff7a1a';ctx.beginPath();ctx.moveTo(12,1);ctx.quadraticCurveTo(25,-1,26,4);ctx.quadraticCurveTo(24,9,12,8);ctx.closePath();ctx.fill();ctx.stroke();ctx.restore()}
+function txt(s,x,y,size,col='#fff',al='center'){ctx.font=`800 ${size}px "Segoe UI",Arial,sans-serif`;ctx.textAlign=al;ctx.lineJoin='round';ctx.lineWidth=size/6;ctx.strokeStyle='#1b2a41';ctx.strokeText(s,x,y);ctx.fillStyle=col;ctx.fillText(s,x,y)}
+function draw(){
+ctx.save();if(shake>0)ctx.translate(R(-1,1)*shake*24,R(-1,1)*shake*24);
+const [c1,c2]=skyCols(),g=ctx.createLinearGradient(0,0,0,GROUND);g.addColorStop(0,rgb(c1));g.addColorStop(1,rgb(c2));ctx.fillStyle=g;ctx.fillRect(0,0,W,H);
+const n=nightness();
+if(n>0){stars.forEach(s=>{ctx.globalAlpha=n*(.5+.5*Math.sin(t*2+s.p));ctx.fillStyle='#fff';ctx.beginPath();ctx.arc(s.x,s.y,s.r,0,7);ctx.fill()});ctx.globalAlpha=n;ctx.fillStyle='#f4f1c9';ctx.beginPath();ctx.arc(760,70,22,0,7);ctx.fill();ctx.fillStyle=rgb(c1);ctx.beginPath();ctx.arc(768,64,19,0,7);ctx.fill();ctx.globalAlpha=1}
+clouds.forEach(cloud);
+hills(hillA,GROUND-95,38,'rgba(127,183,201,.8)',W);hills(hillB,GROUND-45,24,'#58a860',W/2);
+for(const p of pipes){const ty=pipeY(p);pipeShape(p.x,-10,p.w,ty+10,false);pipeShape(p.x,ty+p.gap,p.w,GROUND-ty-p.gap,true)}
+// ground
+const gr=ctx.createLinearGradient(0,GROUND+16,0,H);gr.addColorStop(0,'#fbe38a');gr.addColorStop(1,'#d9b25a');ctx.fillStyle=gr;ctx.fillRect(0,GROUND,W,H-GROUND);
+ctx.fillStyle='#7ccf3a';ctx.fillRect(0,GROUND,W,16);ctx.fillStyle='#62b52a';for(let x=-groundX;x<W;x+=40){ctx.beginPath();ctx.moveTo(x,GROUND+16);ctx.lineTo(x+14,GROUND);ctx.lineTo(x+28,GROUND);ctx.lineTo(x+14,GROUND+16);ctx.fill()}
+ctx.fillStyle='#3e8a1a';ctx.fillRect(0,GROUND+13,W,3);ctx.fillStyle='#a37a2c';ctx.fillRect(0,GROUND+16,W,2);
+parts.forEach(p=>{ctx.globalAlpha=Math.max(0,p.l);ctx.fillStyle=p.c;ctx.beginPath();ctx.arc(p.x,p.y,p.c==='#fff'?2.2:3.2,0,7);ctx.fill()});ctx.globalAlpha=1;
+drawBird();
+if(n>0){ctx.fillStyle=`rgba(5,10,34,${n*.28})`;ctx.fillRect(0,0,W,H)}
+if(state!=='idle')txt(score,W/2,70,52);
+txt('BEST '+best,W-18,34,18,'#fff','right');
+if(state==='idle'||state==='paused'||state==='over'){ctx.fillStyle='rgba(13,17,23,.45)';ctx.fillRect(0,0,W,H);
+ctx.fillStyle='rgba(22,27,34,.92)';ctx.strokeStyle='#30363d';ctx.lineWidth=2;ctx.beginPath();ctx.roundRect(W/2-170,H/2-92,340,170,14);ctx.fill();ctx.stroke();
+if(state==='idle'){txt('FLAPPY',W/2,H/2-42,40,'#ffd92e');txt('endless mode',W/2,H/2-12,16,'#8b949e');txt('Press SPACE or click',W/2,H/2+34,18);txt('to start',W/2,H/2+58,16,'#8b949e')}
+else if(state==='paused'){txt('PAUSED',W/2,H/2-8,38);txt('Press P or click',W/2,H/2+34,16,'#8b949e')}
+else{txt('GAME OVER',W/2,H/2-44,34,'#f85149');txt(`SCORE ${score}   ${medal}`,W/2,H/2-6,22);txt(newBest?'★ NEW BEST!':'BEST '+best,W/2,H/2+22,18,newBest?'#ffd92e':'#8b949e');txt('Click / SPACE to retry',W/2,H/2+56,16,'#c9d1d9')}}
+ctx.restore()}
+let last=performance.now();
+function loop(now){const dt=Math.min(.033,(now-last)/1000);last=now;t+=dt;update(dt);draw();requestAnimationFrame(loop)}
+requestAnimationFrame(loop);
+cv.addEventListener('pointerdown',e=>{e.preventDefault();flap()});
+addEventListener('keydown',e=>{if(['Space','ArrowUp','KeyW'].includes(e.code)){e.preventDefault();flap()}else if(e.code==='KeyP'||e.code==='Escape'){if(state==='run')state='paused';else if(state==='paused')state='run'}else if(e.code==='KeyM')document.getElementById('snd').click()});
+</script>
 </body>
 </html>
