@@ -1,252 +1,57 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 880 300" width="100%" height="100%">
-  <defs>
-    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="0%" y2="100%">
-      <stop offset="0%" stop-color="#0d1117"/>
-      <stop offset="100%" stop-color="#131922"/>
-    </linearGradient>
-    <linearGradient id="pillarGrad" x1="0%" y1="0%" x2="100%" y2="0%">
-      <stop offset="0%" stop-color="#1f2733"/>
-      <stop offset="35%" stop-color="#2b3545"/>
-      <stop offset="100%" stop-color="#181f29"/>
-    </linearGradient>
-    <linearGradient id="fadeLeft" x1="0%" y1="0%" x2="100%" y2="0%">
-      <stop offset="0%" stop-color="#0d1117" stop-opacity="1"/>
-      <stop offset="100%" stop-color="#0d1117" stop-opacity="0"/>
-    </linearGradient>
-    <linearGradient id="fadeRight" x1="0%" y1="0%" x2="100%" y2="0%">
-      <stop offset="0%" stop-color="#0d1117" stop-opacity="0"/>
-      <stop offset="100%" stop-color="#0d1117" stop-opacity="1"/>
-    </linearGradient>
-    <clipPath id="viewport">
-      <rect x="1" y="1" width="878" height="298" rx="10"/>
-    </clipPath>
-    <clipPath id="gameArea">
-      <rect x="1" y="42" width="878" height="226"/>
-    </clipPath>
-
-    <!-- Subtle background grid pattern -->
-    <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
-      <path d="M 40 0 L 0 0 0 40" fill="none" stroke="#1b222d" stroke-width="0.75"/>
-    </pattern>
-
-    <!-- Pillar Set 1: Gap Center y=148 (gap 98..198) -->
-    <g id="colA">
-      <rect x="0" y="40" width="44" height="58" fill="url(#pillarGrad)" stroke="#30363d" stroke-width="1"/>
-      <rect x="-3" y="92" width="50" height="6" rx="1.5" fill="#2d3748" stroke="#3d4758" stroke-width="1"/>
-      <rect x="0" y="198" width="44" height="72" fill="url(#pillarGrad)" stroke="#30363d" stroke-width="1"/>
-      <rect x="-3" y="198" width="50" height="6" rx="1.5" fill="#2d3748" stroke="#3d4758" stroke-width="1"/>
-      <line x1="22" y1="98" x2="22" y2="198" stroke="#21262d" stroke-width="1" stroke-dasharray="3 3"/>
-    </g>
-
-    <!-- Pillar Set 2: Gap Center y=118 (gap 68..168) -->
-    <g id="colB">
-      <rect x="0" y="40" width="44" height="28" fill="url(#pillarGrad)" stroke="#30363d" stroke-width="1"/>
-      <rect x="-3" y="62" width="50" height="6" rx="1.5" fill="#2d3748" stroke="#3d4758" stroke-width="1"/>
-      <rect x="0" y="168" width="44" height="102" fill="url(#pillarGrad)" stroke="#30363d" stroke-width="1"/>
-      <rect x="-3" y="168" width="50" height="6" rx="1.5" fill="#2d3748" stroke="#3d4758" stroke-width="1"/>
-      <line x1="22" y1="68" x2="22" y2="168" stroke="#21262d" stroke-width="1" stroke-dasharray="3 3"/>
-    </g>
-
-    <!-- Pillar Set 3: Gap Center y=172 (gap 122..222) -->
-    <g id="colC">
-      <rect x="0" y="40" width="44" height="82" fill="url(#pillarGrad)" stroke="#30363d" stroke-width="1"/>
-      <rect x="-3" y="116" width="50" height="6" rx="1.5" fill="#2d3748" stroke="#3d4758" stroke-width="1"/>
-      <rect x="0" y="222" width="44" height="48" fill="url(#pillarGrad)" stroke="#30363d" stroke-width="1"/>
-      <rect x="-3" y="222" width="50" height="6" rx="1.5" fill="#2d3748" stroke="#3d4758" stroke-width="1"/>
-      <line x1="22" y1="122" x2="22" y2="222" stroke="#21262d" stroke-width="1" stroke-dasharray="3 3"/>
-    </g>
-
-    <!-- Pillar Set 4: Gap Center y=136 (gap 86..186) -->
-    <g id="colD">
-      <rect x="0" y="40" width="44" height="46" fill="url(#pillarGrad)" stroke="#30363d" stroke-width="1"/>
-      <rect x="-3" y="80" width="50" height="6" rx="1.5" fill="#2d3748" stroke="#3d4758" stroke-width="1"/>
-      <rect x="0" y="186" width="44" height="84" fill="url(#pillarGrad)" stroke="#30363d" stroke-width="1"/>
-      <rect x="-3" y="186" width="50" height="6" rx="1.5" fill="#2d3748" stroke="#3d4758" stroke-width="1"/>
-      <line x1="22" y1="86" x2="22" y2="186" stroke="#21262d" stroke-width="1" stroke-dasharray="3 3"/>
-    </g>
-
-    <style>
-      .sans {
-        font-family: -apple-system, BlinkMacSystemFont, "Inter", "Segoe UI", Helvetica, Arial, sans-serif;
-      }
-      .mono {
-        font-family: "JetBrains Mono", "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
-      }
-      .world-scroll {
-        animation: scrollWorld 8s linear infinite;
-      }
-      .parallax-scroll {
-        animation: scrollParallax 16s linear infinite;
-      }
-      .bird-motion {
-        animation: birdPath 8s cubic-bezier(0.42, 0, 0.58, 1) infinite;
-        transform-origin: 210px 148px;
-      }
-      .wing-anim {
-        animation: wingCycle 0.28s ease-in-out infinite alternate;
-        transform-origin: 206px 149px;
-      }
-      .s0 { animation: tick0 8s steps(1) infinite; }
-      .s1 { animation: tick1 8s steps(1) infinite; }
-      .s2 { animation: tick2 8s steps(1) infinite; }
-      .s3 { animation: tick3 8s steps(1) infinite; }
-
-      @keyframes scrollWorld {
-        0%   { transform: translateX(0px); }
-        100% { transform: translateX(-880px); }
-      }
-      @keyframes scrollParallax {
-        0%   { transform: translateX(0px); }
-        100% { transform: translateX(-440px); }
-      }
-      /* 4 pillars spaced every 220px (220, 440, 660, 880) over 880px period.
-         Bird is at x=210.
-         Pillar 1 (220 -> 210) at t = 1.2%  (gap y=148)
-         Pillar 2 (440 -> 210) at t = 26.1% (gap y=118, offset -30)
-         Pillar 3 (660 -> 210) at t = 51.1% (gap y=172, offset +24)
-         Pillar 4 (880 -> 210) at t = 76.1% (gap y=136, offset -12) */
-      @keyframes birdPath {
-        0%   { transform: translateY(0px) rotate(-6deg); }
-        10%  { transform: translateY(8px) rotate(10deg); }
-        18%  { transform: translateY(-22px) rotate(-14deg); }
-        26%  { transform: translateY(-30px) rotate(-4deg); }
-        38%  { transform: translateY(14px) rotate(14deg); }
-        46%  { transform: translateY(26px) rotate(-10deg); }
-        52%  { transform: translateY(22px) rotate(4deg); }
-        64%  { transform: translateY(4px) rotate(-12deg); }
-        76%  { transform: translateY(-12px) rotate(-4deg); }
-        88%  { transform: translateY(10px) rotate(10deg); }
-        95%  { transform: translateY(-2px) rotate(-10deg); }
-        100% { transform: translateY(0px) rotate(-6deg); }
-      }
-      @keyframes wingCycle {
-        0%   { transform: rotate(-18deg); }
-        100% { transform: rotate(16deg); }
-      }
-      @keyframes tick0 {
-        0%, 100% { opacity: 1; }
-        26%, 99.9% { opacity: 0; }
-      }
-      @keyframes tick1 {
-        0%, 25.9%, 51%, 100% { opacity: 0; }
-        26%, 50.9% { opacity: 1; }
-      }
-      @keyframes tick2 {
-        0%, 50.9%, 76%, 100% { opacity: 0; }
-        51%, 75.9% { opacity: 1; }
-      }
-      @keyframes tick3 {
-        0%, 75.9% { opacity: 0; }
-        76%, 99.9% { opacity: 1; }
-      }
-    </style>
-  </defs>
-
-  <g clip-path="url(#viewport)">
-    <!-- Base Canvas -->
-    <rect width="880" height="300" fill="url(#bgGrad)"/>
-
-    <!-- Game Viewport Area -->
-    <g clip-path="url(#gameArea)">
-      <!-- Subtle Architectural Grid -->
-      <rect x="0" y="42" width="880" height="226" fill="url(#grid)" opacity="0.7"/>
-
-      <!-- Horizon Line & Minimal Parallax Geometry -->
-      <line x1="0" y1="215" x2="880" y2="215" stroke="#1b222d" stroke-width="1"/>
-      <g class="parallax-scroll" stroke="#1f2733" stroke-width="1" fill="#11161f">
-        <rect x="40" y="185" width="60" height="83"/>
-        <rect x="130" y="165" width="45" height="103"/>
-        <rect x="240" y="192" width="75" height="76"/>
-        <rect x="360" y="172" width="50" height="96"/>
-        <rect x="480" y="185" width="60" height="83"/>
-        <rect x="570" y="165" width="45" height="103"/>
-        <rect x="680" y="192" width="75" height="76"/>
-        <rect x="800" y="172" width="50" height="96"/>
-        <rect x="920" y="185" width="60" height="83"/>
-        <rect x="1010" y="165" width="45" height="103"/>
-        <rect x="1120" y="192" width="75" height="76"/>
-        <rect x="1240" y="172" width="50" height="96"/>
-      </g>
-
-      <!-- Trajectory Guide Curve (subtle) -->
-      <path d="M 120 156 Q 170 150, 210 148" fill="none" stroke="#30363d" stroke-width="1.2" stroke-dasharray="2 4"/>
-
-      <!-- Scrolling Pillars (880px cycle) -->
-      <g class="world-scroll">
-        <use href="#colA" x="220" y="0"/>
-        <use href="#colB" x="440" y="0"/>
-        <use href="#colC" x="660" y="0"/>
-        <use href="#colD" x="880" y="0"/>
-
-        <use href="#colA" x="1100" y="0"/>
-        <use href="#colB" x="1320" y="0"/>
-        <use href="#colC" x="1540" y="0"/>
-        <use href="#colD" x="1760" y="0"/>
-      </g>
-
-      <!-- Minimalist Bird / Glider -->
-      <g class="bird-motion">
-        <!-- Subtle wake nodes -->
-        <circle cx="176" cy="150" r="1.5" fill="#484f58"/>
-        <circle cx="188" cy="149" r="2" fill="#6e7681"/>
-
-        <!-- Body (clean geometric capsule/bird) -->
-        <rect x="196" y="140" width="26" height="16" rx="8" fill="#e6edf3" stroke="#0d1117" stroke-width="1.5"/>
-        <!-- Wing -->
-        <g class="wing-anim">
-          <rect x="200" y="146" width="11" height="6" rx="3" fill="#8b949e"/>
-        </g>
-        <!-- Eye -->
-        <circle cx="215" cy="146" r="1.8" fill="#0d1117"/>
-        <!-- Beak accent -->
-        <polygon points="222,145 228,148 222,151" fill="#d29922"/>
-      </g>
-
-      <!-- Edge Vignettes -->
-      <rect x="0" y="42" width="48" height="226" fill="url(#fadeLeft)"/>
-      <rect x="832" y="42" width="48" height="226" fill="url(#fadeRight)"/>
-    </g>
-
-    <!-- Top Header Bar -->
-    <rect x="0" y="0" width="880" height="42" fill="#0d1117"/>
-    <line x1="0" y1="42" x2="880" y2="42" stroke="#21262d" stroke-width="1"/>
-
-    <!-- Window Controls (Subtle Monochrome) -->
-    <circle cx="22" cy="21" r="4.5" fill="#21262d" stroke="#30363d" stroke-width="1"/>
-    <circle cx="36" cy="21" r="4.5" fill="#21262d" stroke="#30363d" stroke-width="1"/>
-    <circle cx="50" cy="21" r="4.5" fill="#21262d" stroke="#30363d" stroke-width="1"/>
-
-    <!-- Title / Repo Path -->
-    <text x="70" y="25" class="mono" font-size="12" fill="#7d8590">denizkokan0-dot <tspan fill="#484f58">/</tspan> <tspan fill="#e6edf3" font-weight="600">flappy</tspan></text>
-
-    <!-- Center Live Telemetry -->
-    <g transform="translate(440, 25)" text-anchor="middle" class="mono" font-size="11.5">
-      <text x="-55" y="0" fill="#7d8590">SCORE</text>
-      <text x="-18" y="0" fill="#e6edf3" font-weight="600" class="s0">14</text>
-      <text x="-18" y="0" fill="#e6edf3" font-weight="600" class="s1">15</text>
-      <text x="-18" y="0" fill="#e6edf3" font-weight="600" class="s2">16</text>
-      <text x="-18" y="0" fill="#e6edf3" font-weight="600" class="s3">17</text>
-      <text x="8" y="0" fill="#30363d">|</text>
-      <text x="52" y="0" fill="#7d8590">BEST <tspan fill="#8b949e">42</tspan></text>
-    </g>
-
-    <!-- Right Action Button (Minimal Pill) -->
-    <rect x="742" y="10" width="122" height="22" rx="5" fill="#161b22" stroke="#30363d" stroke-width="1"/>
-    <circle cx="755" cy="21" r="3" fill="#3fb950"/>
-    <text x="810" y="25" text-anchor="middle" class="sans" font-size="11" font-weight="500" fill="#c9d1d9">Launch Game ↗</text>
-
-    <!-- Bottom Status Bar -->
-    <rect x="0" y="268" width="880" height="32" fill="#0d1117"/>
-    <line x1="0" y1="268" x2="880" y2="268" stroke="#21262d" stroke-width="1"/>
-
-    <text x="20" y="288" class="mono" font-size="11" fill="#7d8590">
-      INPUT <tspan fill="#c9d1d9">[SPACE]</tspan> OR <tspan fill="#c9d1d9">[CLICK]</tspan>
-    </text>
-    <text x="860" y="288" text-anchor="end" class="mono" font-size="11" fill="#7d8590">
-      60 FPS · PHYSICS SIM · CLICK CANVAS TO PLAY
-    </text>
-
-    <!-- Outer Hairline Border -->
-    <rect x="0.5" y="0.5" width="879" height="299" rx="10" fill="none" stroke="#30363d" stroke-width="1"/>
-  </g>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 880 300" width="100%">
+<title>Endless Flappy Bird</title>
+<defs>
+<style>
+text{font-family:"Segoe UI",Arial,sans-serif;font-weight:800}
+.sc{font-size:42px;text-anchor:middle;fill:#fff;stroke:#1b2a41;stroke-width:6;paint-order:stroke;stroke-linejoin:round}
+.lb{font-size:11px;fill:#fff;opacity:.85;letter-spacing:.5px}
+</style>
+<linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+<stop offset="0"><animate attributeName="stop-color" dur="84.923s" repeatCount="indefinite" keyTimes="0;.3;.5;.8;1" values="#3fb4e8;#f2845c;#0a1238;#f2845c;#3fb4e8"/></stop>
+<stop offset="1"><animate attributeName="stop-color" dur="84.923s" repeatCount="indefinite" keyTimes="0;.3;.5;.8;1" values="#bdeaf5;#ffd08a;#2a3b7a;#ffd08a;#bdeaf5"/></stop>
+</linearGradient>
+<linearGradient id="pg" x1="0" y1="0" x2="1" y2="0">
+<stop offset="0" stop-color="#3f7d14"/><stop offset=".25" stop-color="#9be045"/><stop offset=".6" stop-color="#6cb52a"/><stop offset="1" stop-color="#3a7312"/>
+</linearGradient>
+<linearGradient id="bg2" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fbe38a"/><stop offset="1" stop-color="#d9b25a"/></linearGradient>
+<clipPath id="rc"><rect width="880" height="300" rx="14"/></clipPath>
+<clipPath id="sw"><rect x="360" y="8" width="160" height="56"/></clipPath>
+<pattern id="gr" width="40" height="14" patternUnits="userSpaceOnUse"><rect width="40" height="14" fill="#7ccf3a"/><path d="M0 14L14 0H28L14 14Z" fill="#62b52a"/><path d="M0 12H40" stroke="#3e8a1a" stroke-width="3"/></pattern>
+<g id="T"><rect x="0" y="-320" width="54" height="320" fill="url(#pg)" stroke="#27500c" stroke-width="2.5"/><rect x="-5" y="-26" width="64" height="26" rx="4" fill="url(#pg)" stroke="#27500c" stroke-width="2.5"/></g>
+<g id="B"><rect x="0" y="0" width="54" height="320" fill="url(#pg)" stroke="#27500c" stroke-width="2.5"/><rect x="-5" y="0" width="64" height="26" rx="4" fill="url(#pg)" stroke="#27500c" stroke-width="2.5"/></g>
+<path id="h1" d="M0 260V195Q110 140 220 195T440 195T660 195T880 195V260Z"/>
+<path id="h2" d="M0 260V222Q55 190 110 222T220 222T330 222T440 222T550 222T660 222T770 222T880 222V260Z"/>
+<g id="cl"><ellipse cx="0" cy="0" rx="26" ry="12"/><ellipse cx="-20" cy="5" rx="18" ry="9"/><ellipse cx="22" cy="5" rx="20" ry="9"/><ellipse cx="6" cy="-9" rx="16" ry="11"/></g>
+</defs>
+<g clip-path="url(#rc)">
+<rect width="880" height="300" fill="url(#sky)"/>
+<g fill="#fff"><animate attributeName="opacity" dur="84.923s" repeatCount="indefinite" keyTimes="0;.3;.5;.8;1" values="0;.3;1;.3;0"/>
+<circle cx="60" cy="30" r="1.4"/><circle cx="150" cy="70" r="1"/><circle cx="240" cy="25" r="1.6"/><circle cx="330" cy="90" r="1"/><circle cx="420" cy="40" r="1.3"/><circle cx="520" cy="80" r="1"/><circle cx="610" cy="28" r="1.5"/><circle cx="700" cy="65" r="1"/><circle cx="790" cy="35" r="1.4"/><circle cx="850" cy="95" r="1"/></g>
+<g fill="#fff" opacity=".85"><animateTransform attributeName="transform" type="translate" from="0 0" to="-880 0" dur="44s" repeatCount="indefinite"/>
+<use href="#cl" x="90" y="60"/><use href="#cl" x="330" y="95" transform="translate(330 95) scale(.8) translate(-330 -95)"/><use href="#cl" x="600" y="50"/><use href="#cl" x="780" y="105"/>
+<use href="#cl" x="970" y="60"/><use href="#cl" x="1210" y="95"/><use href="#cl" x="1480" y="50"/><use href="#cl" x="1660" y="105"/></g>
+<g fill="#7fb7c9" opacity=".75"><animateTransform attributeName="transform" type="translate" from="0 0" to="-880 0" dur="60s" repeatCount="indefinite"/><use href="#h1"/><use href="#h1" x="880"/></g>
+<g fill="#58a860"><animateTransform attributeName="transform" type="translate" from="0 0" to="-880 0" dur="30s" repeatCount="indefinite"/><use href="#h2"/><use href="#h2" x="880"/></g>
+<g><animateTransform attributeName="transform" type="translate" from="0 0" to="-11040 0" dur="84.923s" repeatCount="indefinite"/>
+<use href="#T" x="223" y="89"/><use href="#B" x="223" y="195"/><use href="#T" x="453" y="103"/><use href="#B" x="453" y="209"/><use href="#T" x="683" y="91"/><use href="#B" x="683" y="197"/><use href="#T" x="913" y="89"/><use href="#B" x="913" y="195"/><use href="#T" x="1143" y="97"/><use href="#B" x="1143" y="203"/><use href="#T" x="1373" y="107"/><use href="#B" x="1373" y="213"/><use href="#T" x="1603" y="56"/><use href="#B" x="1603" y="162"/><use href="#T" x="1833" y="55"/><use href="#B" x="1833" y="161"/><use href="#T" x="2063" y="97"/><use href="#B" x="2063" y="203"/><use href="#T" x="2293" y="92"/><use href="#B" x="2293" y="198"/><use href="#T" x="2523" y="112"/><use href="#B" x="2523" y="218"/><use href="#T" x="2753" y="110"/><use href="#B" x="2753" y="216"/><use href="#T" x="2983" y="55"/><use href="#B" x="2983" y="161"/><use href="#T" x="3213" y="44"/><use href="#B" x="3213" y="150"/><use href="#T" x="3443" y="89"/><use href="#B" x="3443" y="195"/><use href="#T" x="3673" y="70"/><use href="#B" x="3673" y="176"/><use href="#T" x="3903" y="50"/><use href="#B" x="3903" y="156"/><use href="#T" x="4133" y="43"/><use href="#B" x="4133" y="149"/><use href="#T" x="4363" y="100"/><use href="#B" x="4363" y="206"/><use href="#T" x="4593" y="120"/><use href="#B" x="4593" y="226"/><use href="#T" x="4823" y="108"/><use href="#B" x="4823" y="214"/><use href="#T" x="5053" y="48"/><use href="#B" x="5053" y="154"/><use href="#T" x="5283" y="108"/><use href="#B" x="5283" y="214"/><use href="#T" x="5513" y="82"/><use href="#B" x="5513" y="188"/><use href="#T" x="5743" y="89"/><use href="#B" x="5743" y="195"/><use href="#T" x="5973" y="115"/><use href="#B" x="5973" y="221"/><use href="#T" x="6203" y="110"/><use href="#B" x="6203" y="216"/><use href="#T" x="6433" y="112"/><use href="#B" x="6433" y="218"/><use href="#T" x="6663" y="52"/><use href="#B" x="6663" y="158"/><use href="#T" x="6893" y="99"/><use href="#B" x="6893" y="205"/><use href="#T" x="7123" y="39"/><use href="#B" x="7123" y="145"/><use href="#T" x="7353" y="99"/><use href="#B" x="7353" y="205"/><use href="#T" x="7583" y="40"/><use href="#B" x="7583" y="146"/><use href="#T" x="7813" y="39"/><use href="#B" x="7813" y="145"/><use href="#T" x="8043" y="36"/><use href="#B" x="8043" y="142"/><use href="#T" x="8273" y="56"/><use href="#B" x="8273" y="162"/><use href="#T" x="8503" y="62"/><use href="#B" x="8503" y="168"/><use href="#T" x="8733" y="95"/><use href="#B" x="8733" y="201"/><use href="#T" x="8963" y="35"/><use href="#B" x="8963" y="141"/><use href="#T" x="9193" y="91"/><use href="#B" x="9193" y="197"/><use href="#T" x="9423" y="73"/><use href="#B" x="9423" y="179"/><use href="#T" x="9653" y="88"/><use href="#B" x="9653" y="194"/><use href="#T" x="9883" y="107"/><use href="#B" x="9883" y="213"/><use href="#T" x="10113" y="57"/><use href="#B" x="10113" y="163"/><use href="#T" x="10343" y="98"/><use href="#B" x="10343" y="204"/><use href="#T" x="10573" y="61"/><use href="#B" x="10573" y="167"/><use href="#T" x="10803" y="113"/><use href="#B" x="10803" y="219"/><use href="#T" x="11033" y="69"/><use href="#B" x="11033" y="175"/><use href="#T" x="11263" y="89"/><use href="#B" x="11263" y="195"/><use href="#T" x="11493" y="103"/><use href="#B" x="11493" y="209"/><use href="#T" x="11723" y="91"/><use href="#B" x="11723" y="197"/><use href="#T" x="11953" y="89"/><use href="#B" x="11953" y="195"/>
+</g>
+<g><animateTransform attributeName="transform" type="translate" from="0 0" to="-40 0" dur="0.308s" repeatCount="indefinite"/>
+<rect x="0" y="250" width="960" height="14" fill="url(#gr)"/><rect x="0" y="264" width="960" height="36" fill="url(#bg2)"/><path d="M0 264H960" stroke="#a37a2c" stroke-width="2"/></g>
+<g transform="translate(250 0)">
+<g><animateTransform attributeName="transform" type="translate" dur="84.923s" repeatCount="indefinite" calcMode="spline" keyTimes="0;0.006;0.015;0.027;0.036;0.048;0.057;0.068;0.077;0.089;0.098;0.11;0.119;0.131;0.14;0.152;0.161;0.173;0.182;0.193;0.202;0.214;0.223;0.235;0.244;0.256;0.265;0.277;0.286;0.298;0.307;0.318;0.327;0.339;0.348;0.36;0.369;0.381;0.39;0.402;0.411;0.423;0.432;0.443;0.452;0.464;0.473;0.485;0.494;0.506;0.515;0.527;0.536;0.548;0.557;0.568;0.577;0.589;0.598;0.61;0.619;0.631;0.64;0.652;0.661;0.673;0.682;0.693;0.702;0.714;0.723;0.735;0.744;0.756;0.765;0.777;0.786;0.798;0.807;0.818;0.827;0.839;0.848;0.86;0.869;0.881;0.89;0.902;0.911;0.923;0.932;0.943;0.952;0.964;0.973;0.985;0.994;1" keySplines="0 0 1 1;.45 0 .55 1;0 0 1 1;.45 0 .55 1;0 0 1 1;.45 0 .55 1;0 0 1 1;.45 0 .55 1;0 0 1 1;.45 0 .55 1;0 0 1 1;.45 0 .55 1;0 0 1 1;.45 0 .55 1;0 0 1 1;.45 0 .55 1;0 0 1 1;.45 0 .55 1;0 0 1 1;.45 0 .55 1;0 0 1 1;.45 0 .55 1;0 0 1 1;.45 0 .55 1;0 0 1 1;.45 0 .55 1;0 0 1 1;.45 0 .55 1;0 0 1 1;.45 0 .55 1;0 0 1 1;.45 0 .55 1;0 0 1 1;.45 0 .55 1;0 0 1 1;.45 0 .55 1;0 0 1 1;.45 0 .55 1;0 0 1 1;.45 0 .55 1;0 0 1 1;.45 0 .55 1;0 0 1 1;.45 0 .55 1;0 0 1 1;.45 0 .55 1;0 0 1 1;.45 0 .55 1;0 0 1 1;.45 0 .55 1;0 0 1 1;.45 0 .55 1;0 0 1 1;.45 0 .55 1;0 0 1 1;.45 0 .55 1;0 0 1 1;.45 0 .55 1;0 0 1 1;.45 0 .55 1;0 0 1 1;.45 0 .55 1;0 0 1 1;.45 0 .55 1;0 0 1 1;.45 0 .55 1;0 0 1 1;.45 0 .55 1;0 0 1 1;.45 0 .55 1;0 0 1 1;.45 0 .55 1;0 0 1 1;.45 0 .55 1;0 0 1 1;.45 0 .55 1;0 0 1 1;.45 0 .55 1;0 0 1 1;.45 0 .55 1;0 0 1 1;.45 0 .55 1;0 0 1 1;.45 0 .55 1;0 0 1 1;.45 0 .55 1;0 0 1 1;.45 0 .55 1;0 0 1 1;.45 0 .55 1;0 0 1 1;.45 0 .55 1;0 0 1 1" values="0 142;0 142;0 156;0 156;0 144;0 144;0 142;0 142;0 150;0 150;0 160;0 160;0 109;0 109;0 108;0 108;0 150;0 150;0 145;0 145;0 165;0 165;0 163;0 163;0 108;0 108;0 97;0 97;0 142;0 142;0 123;0 123;0 103;0 103;0 96;0 96;0 153;0 153;0 173;0 173;0 161;0 161;0 101;0 101;0 161;0 161;0 135;0 135;0 142;0 142;0 168;0 168;0 163;0 163;0 165;0 165;0 105;0 105;0 152;0 152;0 92;0 92;0 152;0 152;0 93;0 93;0 92;0 92;0 89;0 89;0 109;0 109;0 115;0 115;0 148;0 148;0 88;0 88;0 144;0 144;0 126;0 126;0 141;0 141;0 160;0 160;0 110;0 110;0 151;0 151;0 114;0 114;0 166;0 166;0 122;0 122;0 142;0 142"/>
+<g><animateTransform attributeName="transform" type="translate" dur=".56s" repeatCount="indefinite" calcMode="spline" keyTimes="0;.4;1" keySplines=".2 .6 .4 1;.6 0 .8 .4" values="0 6;0 -8;0 6"/>
+<g><animateTransform attributeName="transform" type="rotate" dur=".56s" repeatCount="indefinite" calcMode="spline" keyTimes="0;.4;1" keySplines=".3 .5 .5 1;.5 0 .8 .5" values="16;-18;16"/>
+<path d="M-14 -2L-24 -6L-22 3Z" fill="#f2a900" stroke="#5a3b00" stroke-width="2" stroke-linejoin="round"/>
+<ellipse rx="16" ry="13" fill="#ffd92e" stroke="#5a3b00" stroke-width="2.5"/>
+<ellipse cx="1" cy="6" rx="11" ry="5" fill="#fff3a6"/>
+<g><animateTransform attributeName="transform" type="rotate" dur=".28s" repeatCount="indefinite" values="-28 -5 2;22 -5 2;-28 -5 2"/><ellipse cx="-6" cy="3" rx="9" ry="5.5" fill="#fff" stroke="#5a3b00" stroke-width="2"/></g>
+<circle cx="7" cy="-5" r="5.5" fill="#fff" stroke="#5a3b00" stroke-width="2"/><circle cx="9" cy="-5" r="2.4" fill="#111"/>
+<path d="M12 1Q25 -1 26 4Q24 9 12 8Z" fill="#ff7a1a" stroke="#5a3b00" stroke-width="2" stroke-linejoin="round"/>
+</g></g></g></g>
+<rect width="880" height="300" fill="#050a22"><animate attributeName="opacity" dur="84.923s" repeatCount="indefinite" keyTimes="0;.3;.5;.8;1" values="0;.12;.5;.12;0"/></rect>
+<g clip-path="url(#sw)"><g class="sc"><animateTransform attributeName="transform" type="translate" dur="84.923s" repeatCount="indefinite" calcMode="discrete" keyTimes="0;0.021;0.042;0.062;0.083;0.104;0.125;0.146;0.167;0.188;0.208;0.229;0.25;0.271;0.292;0.312;0.333;0.354;0.375;0.396;0.417;0.438;0.458;0.479;0.5;0.521;0.542;0.562;0.583;0.604;0.625;0.646;0.667;0.688;0.708;0.729;0.75;0.771;0.792;0.812;0.833;0.854;0.875;0.896;0.917;0.938;0.958;0.979" values="0 0;0 -70;0 -140;0 -210;0 -280;0 -350;0 -420;0 -490;0 -560;0 -630;0 -700;0 -770;0 -840;0 -910;0 -980;0 -1050;0 -1120;0 -1190;0 -1260;0 -1330;0 -1400;0 -1470;0 -1540;0 -1610;0 -1680;0 -1750;0 -1820;0 -1890;0 -1960;0 -2030;0 -2100;0 -2170;0 -2240;0 -2310;0 -2380;0 -2450;0 -2520;0 -2590;0 -2660;0 -2730;0 -2800;0 -2870;0 -2940;0 -3010;0 -3080;0 -3150;0 -3220;0 -3290"/><text x="440" y="50">1</text><text x="440" y="120">2</text><text x="440" y="190">3</text><text x="440" y="260">4</text><text x="440" y="330">5</text><text x="440" y="400">6</text><text x="440" y="470">7</text><text x="440" y="540">8</text><text x="440" y="610">9</text><text x="440" y="680">10</text><text x="440" y="750">11</text><text x="440" y="820">12</text><text x="440" y="890">13</text><text x="440" y="960">14</text><text x="440" y="1030">15</text><text x="440" y="1100">16</text><text x="440" y="1170">17</text><text x="440" y="1240">18</text><text x="440" y="1310">19</text><text x="440" y="1380">20</text><text x="440" y="1450">21</text><text x="440" y="1520">22</text><text x="440" y="1590">23</text><text x="440" y="1660">24</text><text x="440" y="1730">25</text><text x="440" y="1800">26</text><text x="440" y="1870">27</text><text x="440" y="1940">28</text><text x="440" y="2010">29</text><text x="440" y="2080">30</text><text x="440" y="2150">31</text><text x="440" y="2220">32</text><text x="440" y="2290">33</text><text x="440" y="2360">34</text><text x="440" y="2430">35</text><text x="440" y="2500">36</text><text x="440" y="2570">37</text><text x="440" y="2640">38</text><text x="440" y="2710">39</text><text x="440" y="2780">40</text><text x="440" y="2850">41</text><text x="440" y="2920">42</text><text x="440" y="2990">43</text><text x="440" y="3060">44</text><text x="440" y="3130">45</text><text x="440" y="3200">46</text><text x="440" y="3270">47</text><text x="440" y="3340">48</text></g></g>
+<text class="lb" x="18" y="288" style="fill:#4a3512;opacity:.9">denizkokan0-dot · endless flappy</text>
+<g><rect x="772" y="14" width="94" height="28" rx="14" fill="#1b2a41" opacity=".78"/><text x="819" y="33" text-anchor="middle" style="font-size:12px;fill:#fff">▶ PLAY</text></g>
+<rect x="1" y="1" width="878" height="298" rx="13" fill="none" stroke="#1b2a41" stroke-opacity=".6" stroke-width="2"/>
+</g>
 </svg>
