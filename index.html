@@ -1,15 +1,31 @@
 <!DOCTYPE html>
-<html lang="tr">
+<html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>Flappy Bird Arcade — @denizkokan0-dot</title>
+  <title>denizkokan0-dot / flappy</title>
   <style>
     :root {
-      --bg-dark: #090d16;
-      --card-bg: #111827;
-      --accent: #38bdf8;
-      --gold: #facc15;
+      --bg: #0d1117;
+      --surface: #161b22;
+      --border: #30363d;
+      --border-subtle: #21262d;
+      --text: #e6edf3;
+      --text-muted: #7d8590;
+      --accent: #d29922;
+      --success: #3fb950;
+      --danger: #f85149;
+    }
+    [data-theme="paper"] {
+      --bg: #f6f5f2;
+      --surface: #eceae4;
+      --border: #d0cdc4;
+      --border-subtle: #e2dfd7;
+      --text: #1c1e21;
+      --text-muted: #6e7278;
+      --accent: #b5651d;
+      --success: #2da44e;
+      --danger: #cf222e;
     }
     * {
       box-sizing: border-box;
@@ -19,74 +35,87 @@
       -webkit-user-select: none;
     }
     body {
-      background: radial-gradient(circle at top, #1e293b 0%, #090d16 75%);
-      color: #f8fafc;
-      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+      background-color: var(--bg);
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, "Inter", "Segoe UI", Helvetica, Arial, sans-serif;
       min-height: 100vh;
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      padding: 16px;
+      padding: 20px;
+      transition: background-color 0.2s ease, color 0.2s ease;
+    }
+    .shell {
+      width: 100%;
+      max-width: 760px;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      background: var(--bg);
       overflow: hidden;
+      box-shadow: 0 16px 48px rgba(0, 0, 0, 0.35);
     }
-    .arcade-wrapper {
+    .topbar {
+      height: 44px;
+      padding: 0 16px;
       display: flex;
-      flex-direction: column;
       align-items: center;
-      gap: 14px;
-      max-width: 460px;
-      width: 100%;
-    }
-    .header-bar {
-      width: 100%;
-      display: flex;
       justify-content: space-between;
-      align-items: center;
-      background: rgba(15, 23, 42, 0.85);
-      border: 1px solid rgba(56, 189, 248, 0.35);
-      padding: 10px 16px;
-      border-radius: 14px;
-      backdrop-filter: blur(8px);
-      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.45);
+      border-bottom: 1px solid var(--border-subtle);
+      font-family: "JetBrains Mono", "SFMono-Regular", Consolas, monospace;
+      font-size: 12px;
     }
-    .profile-link {
-      color: var(--accent);
-      text-decoration: none;
-      font-weight: 700;
-      font-size: 0.95rem;
+    .brand {
       display: flex;
       align-items: center;
       gap: 8px;
-      transition: color 0.2s;
+      color: var(--text-muted);
+      text-decoration: none;
     }
-    .profile-link:hover {
-      color: var(--gold);
+    .brand strong {
+      color: var(--text);
+      font-weight: 600;
     }
-    .score-pills {
+    .brand:hover strong {
+      text-decoration: underline;
+    }
+    .telemetry {
       display: flex;
-      gap: 10px;
-      font-family: Consolas, monospace;
-      font-size: 0.9rem;
+      align-items: center;
+      gap: 16px;
+      color: var(--text-muted);
     }
-    .pill {
-      background: #1e293b;
-      padding: 4px 10px;
-      border-radius: 8px;
-      border: 1px solid rgba(250, 204, 21, 0.35);
-      color: var(--gold);
-      font-weight: bold;
+    .telemetry span b {
+      color: var(--text);
+      font-weight: 600;
     }
-    .canvas-container {
+    .toolbar {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .btn {
+      background: var(--surface);
+      color: var(--text);
+      border: 1px solid var(--border);
+      border-radius: 5px;
+      padding: 4px 9px;
+      font-family: inherit;
+      font-size: 11px;
+      cursor: pointer;
+      transition: border-color 0.15s;
+    }
+    .btn:hover {
+      border-color: var(--text-muted);
+    }
+    .btn.active {
+      border-color: var(--text);
+    }
+    .viewport {
       position: relative;
       width: 100%;
-      max-width: 420px;
-      aspect-ratio: 420 / 580;
-      border-radius: 18px;
-      overflow: hidden;
-      border: 3px solid rgba(56, 189, 248, 0.6);
-      box-shadow: 0 0 35px rgba(56, 189, 248, 0.2), 0 15px 40px rgba(0,0,0,0.65);
-      background: #0f172a;
+      aspect-ratio: 760 / 420;
+      background: var(--bg);
     }
     canvas {
       width: 100%;
@@ -95,58 +124,143 @@
       cursor: pointer;
       touch-action: manipulation;
     }
-    .controls-hint {
-      font-size: 0.85rem;
-      color: #94a3b8;
-      text-align: center;
-      font-family: Consolas, monospace;
+    .statusbar {
+      height: 34px;
+      padding: 0 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-top: 1px solid var(--border-subtle);
+      font-family: "JetBrains Mono", "SFMono-Regular", Consolas, monospace;
+      font-size: 11px;
+      color: var(--text-muted);
     }
-    .controls-hint kbd {
-      background: #1e293b;
-      border: 1px solid #475569;
-      border-radius: 5px;
-      padding: 2px 7px;
-      color: #f8fafc;
-      font-weight: bold;
+    .keys kbd {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 3px;
+      padding: 1px 5px;
+      font-size: 10px;
+      color: var(--text);
+    }
+    @media (max-width: 600px) {
+      .viewport {
+        aspect-ratio: 4 / 5;
+      }
+      .statusbar .right-meta {
+        display: none;
+      }
     }
   </style>
 </head>
 <body>
-  <div class="arcade-wrapper">
-    <div class="header-bar">
-      <a class="profile-link" href="https://github.com/denizkokan0-dot" target="_top">
-        <span>🐦 @denizkokan0-dot</span>
+  <div class="shell">
+    <div class="topbar">
+      <a class="brand" href="https://github.com/denizkokan0-dot" target="_top">
+        <span>denizkokan0-dot</span>
+        <span>/</span>
+        <strong>flappy</strong>
       </a>
-      <div class="score-pills">
-        <div class="pill">SKOR: <span id="scoreVal">0</span></div>
-        <div class="pill">REKOR: <span id="bestVal">0</span></div>
+
+      <div class="telemetry">
+        <span>SCORE <b id="scoreVal">00</b></span>
+        <span>BEST <b id="bestVal">00</b></span>
+      </div>
+
+      <div class="toolbar">
+        <button class="btn" id="modeBtn" title="Switch speed mode">MODE: NORMAL</button>
+        <button class="btn" id="soundBtn" title="Toggle audio (M)">AUDIO: ON</button>
+        <button class="btn" id="themeBtn" title="Toggle theme (T)">THEME</button>
       </div>
     </div>
 
-    <div class="canvas-container">
-      <canvas id="gameCanvas" width="420" height="580"></canvas>
+    <div class="viewport">
+      <canvas id="stage"></canvas>
     </div>
 
-    <div class="controls-hint">
-      Zıplamak için <kbd>SPACE</kbd>, <kbd>↑</kbd> veya <kbd>Ekrana Tıkla / Dokun</kbd>
+    <div class="statusbar">
+      <div class="keys">
+        <kbd>SPACE</kbd> / <kbd>CLICK</kbd> Jump &nbsp;·&nbsp; <kbd>P</kbd> Pause &nbsp;·&nbsp; <kbd>M</kbd> Mute &nbsp;·&nbsp; <kbd>T</kbd> Theme
+      </div>
+      <div class="right-meta" id="fpsMeta">60 FPS · READY</div>
     </div>
   </div>
 
   <script>
-    const canvas = document.getElementById('gameCanvas');
+    const canvas = document.getElementById('stage');
     const ctx = canvas.getContext('2d');
     const scoreEl = document.getElementById('scoreVal');
     const bestEl = document.getElementById('bestVal');
+    const modeBtn = document.getElementById('modeBtn');
+    const soundBtn = document.getElementById('soundBtn');
+    const themeBtn = document.getElementById('themeBtn');
+    const fpsMeta = document.getElementById('fpsMeta');
 
-    const W = canvas.width;
-    const H = canvas.height;
-    const GROUND_H = 70;
+    // Logical dimensions
+    const LOGICAL_W = 760;
+    const LOGICAL_H = 420;
 
-    // Web Audio API Retro Sound Synth
+    function resizeCanvas() {
+      const dpr = window.devicePixelRatio || 1;
+      canvas.width = LOGICAL_W * dpr;
+      canvas.height = LOGICAL_H * dpr;
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    }
+    resizeCanvas();
+    window.addEventListener('resize', resizeCanvas);
+
+    // Theme palettes
+    const PALETTES = {
+      dark: {
+        bg: '#0d1117',
+        grid: '#161c24',
+        horizon: '#21262d',
+        cityFill: '#11161d',
+        cityStroke: '#1f2631',
+        pillarFill: '#1c232e',
+        pillarCap: '#283140',
+        pillarStroke: '#30363d',
+        guide: '#21262d',
+        birdFill: '#e6edf3',
+        birdStroke: '#0d1117',
+        wing: '#8b949e',
+        accent: '#d29922',
+        text: '#e6edf3',
+        muted: '#7d8590',
+        overlay: 'rgba(13, 17, 23, 0.78)',
+        card: '#161b22'
+      },
+      paper: {
+        bg: '#f6f5f2',
+        grid: '#eae8e1',
+        horizon: '#dcd9cf',
+        cityFill: '#efede7',
+        cityStroke: '#dcd9cf',
+        pillarFill: '#e2dfd7',
+        pillarCap: '#d4d0c5',
+        pillarStroke: '#b8b3a6',
+        guide: '#dcd9cf',
+        birdFill: '#1c1e21',
+        birdStroke: '#f6f5f2',
+        wing: '#6e7278',
+        accent: '#b5651d',
+        text: '#1c1e21',
+        muted: '#6e7278',
+        overlay: 'rgba(246, 245, 242, 0.82)',
+        card: '#eceae4'
+      }
+    };
+
+    let currentTheme = localStorage.getItem('flappy_theme') || 'dark';
+    document.documentElement.setAttribute('data-theme', currentTheme);
+
+    // Sound Synthesizer (Subtle, minimal clicks/tones)
     const AudioCtx = window.AudioContext || window.webkitAudioContext;
     let audioCtx = null;
+    let soundEnabled = true;
 
-    function playSound(type) {
+    function playTone(type) {
+      if (!soundEnabled) return;
       try {
         if (!audioCtx) audioCtx = new AudioCtx();
         if (audioCtx.state === 'suspended') audioCtx.resume();
@@ -156,412 +270,459 @@
         gain.connect(audioCtx.destination);
         const now = audioCtx.currentTime;
 
-        if (type === 'flap') {
+        if (type === 'jump') {
           osc.type = 'sine';
-          osc.frequency.setValueAtTime(320, now);
-          osc.frequency.exponentialRampToValueAtTime(580, now + 0.09);
-          gain.gain.setValueAtTime(0.14, now);
-          gain.gain.exponentialRampToValueAtTime(0.01, now + 0.09);
+          osc.frequency.setValueAtTime(240, now);
+          osc.frequency.exponentialRampToValueAtTime(380, now + 0.065);
+          gain.gain.setValueAtTime(0.06, now);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + 0.065);
           osc.start(now);
-          osc.stop(now + 0.09);
-        } else if (type === 'score') {
+          osc.stop(now + 0.065);
+        } else if (type === 'point') {
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(587.33, now); // D5
+          osc.frequency.setValueAtTime(880, now + 0.055); // A5
+          gain.gain.setValueAtTime(0.07, now);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + 0.16);
+          osc.start(now);
+          osc.stop(now + 0.16);
+        } else if (type === 'crash') {
           osc.type = 'triangle';
-          osc.frequency.setValueAtTime(520, now);
-          osc.frequency.setValueAtTime(780, now + 0.07);
-          gain.gain.setValueAtTime(0.16, now);
-          gain.gain.exponentialRampToValueAtTime(0.01, now + 0.22);
+          osc.frequency.setValueAtTime(140, now);
+          osc.frequency.exponentialRampToValueAtTime(45, now + 0.18);
+          gain.gain.setValueAtTime(0.12, now);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + 0.18);
           osc.start(now);
-          osc.stop(now + 0.22);
-        } else if (type === 'hit') {
-          osc.type = 'sawtooth';
-          osc.frequency.setValueAtTime(190, now);
-          osc.frequency.exponentialRampToValueAtTime(55, now + 0.28);
-          gain.gain.setValueAtTime(0.2, now);
-          gain.gain.exponentialRampToValueAtTime(0.01, now + 0.28);
-          osc.start(now);
-          osc.stop(now + 0.28);
+          osc.stop(now + 0.18);
         }
-      } catch (e) {}
+      } catch (_) {}
     }
 
-    let state = 'START'; // START, PLAY, OVER
-    let frames = 0;
-    let score = 0;
-    let bestScore = parseInt(localStorage.getItem('deniz_flappy_best') || '0', 10);
-    bestEl.textContent = bestScore;
+    // Modes
+    const MODES = {
+      NORMAL: { speed: 215, gap: 118, gravity: 980, jump: -325, interval: 240 },
+      FAST:   { speed: 285, gap: 110, gravity: 1120, jump: -355, interval: 230 }
+    };
+    let modeKey = 'NORMAL';
 
-    const bird = {
-      x: 95,
-      y: H / 2 - 30,
+    // Game State
+    let state = 'IDLE'; // IDLE, RUNNING, PAUSED, OVER
+    let score = 0;
+    let best = parseInt(localStorage.getItem('deniz_flappy_clean_best') || '0', 10);
+    let shakeTime = 0;
+    let scrollX = 0;
+
+    function fmt(n) {
+      return String(n).padStart(2, '0');
+    }
+    bestEl.textContent = fmt(best);
+
+    const glider = {
+      x: 180,
+      y: LOGICAL_H / 2,
       vy: 0,
-      gravity: 0.38,
-      jump: -7.2,
-      radius: 15,
-      rotation: 0,
+      w: 28,
+      h: 16,
+      angle: 0,
+      trail: [],
       reset() {
-        this.y = H / 2 - 30;
+        this.y = LOGICAL_H / 2;
         this.vy = 0;
-        this.rotation = 0;
+        this.angle = 0;
+        this.trail = [];
       },
-      flap() {
-        this.vy = this.jump;
-        playSound('flap');
-        spawnParticles(this.x - 10, this.y + 5, '#fef08a', 6);
+      jump() {
+        const cfg = MODES[modeKey];
+        this.vy = cfg.jump;
+        playTone('jump');
+        for (let i = 0; i < 4; i++) {
+          particles.push({
+            x: this.x - 10,
+            y: this.y + (Math.random() - 0.5) * 6,
+            vx: -60 - Math.random() * 50,
+            vy: (Math.random() - 0.5) * 40,
+            life: 1
+          });
+        }
       },
-      update() {
-        if (state === 'START') {
-          this.y = H / 2 - 30 + Math.sin(frames * 0.08) * 9;
-          this.rotation = 0;
+      update(dt, time) {
+        if (state === 'IDLE') {
+          this.y = LOGICAL_H / 2 + Math.sin(time * 3.2) * 7;
+          this.angle = Math.cos(time * 3.2) * 0.08;
           return;
         }
-        this.vy += this.gravity;
-        this.y += this.vy;
+        const cfg = MODES[modeKey];
+        this.vy += cfg.gravity * dt;
+        this.y += this.vy * dt;
 
-        if (this.vy < 0) {
-          this.rotation = Math.max(-0.45, this.vy * 0.06);
-        } else {
-          this.rotation = Math.min(Math.PI / 2.2, this.vy * 0.07);
+        const targetAngle = Math.max(-0.42, Math.min(0.85, this.vy / 480));
+        this.angle += (targetAngle - this.angle) * Math.min(1, dt * 14);
+
+        // Record wake trail
+        this.trail.unshift({ x: this.x - 10, y: this.y });
+        if (this.trail.length > 18) this.trail.pop();
+        for (let i = 0; i < this.trail.length; i++) {
+          this.trail[i].x -= cfg.speed * dt;
         }
 
-        // Floor collision
-        if (this.y + this.radius >= H - GROUND_H) {
-          this.y = H - GROUND_H - this.radius;
-          if (state === 'PLAY') triggerGameOver();
-        }
-        // Ceiling clamp
-        if (this.y - this.radius < 0) {
-          this.y = this.radius;
+        // Floor / ceiling collision
+        const r = 7;
+        if (this.y + r >= LOGICAL_H - 1) {
+          this.y = LOGICAL_H - 1 - r;
+          endGame();
+        } else if (this.y - r <= 1) {
+          this.y = 1 + r;
           this.vy = 0;
         }
       },
-      draw() {
+      draw(pal, time) {
+        // Draw wake trail
+        for (let i = 0; i < this.trail.length; i += 3) {
+          const pt = this.trail[i];
+          const alpha = (1 - i / this.trail.length) * 0.35;
+          ctx.fillStyle = pal.muted;
+          ctx.globalAlpha = alpha;
+          ctx.beginPath();
+          ctx.arc(pt.x, pt.y, 1.6, 0, Math.PI * 2);
+          ctx.fill();
+        }
+        ctx.globalAlpha = 1;
+
         ctx.save();
         ctx.translate(this.x, this.y);
-        ctx.rotate(this.rotation);
+        ctx.rotate(this.angle);
 
-        // Glow
-        ctx.fillStyle = 'rgba(250, 204, 21, 0.2)';
+        // Capsule body
+        ctx.fillStyle = pal.birdFill;
+        ctx.strokeStyle = pal.birdStroke;
+        ctx.lineWidth = 1.5;
         ctx.beginPath();
-        ctx.arc(0, 0, 22, 0, Math.PI * 2);
-        ctx.fill();
-
-        // Body
-        ctx.fillStyle = '#facc15';
-        ctx.strokeStyle = '#0f172a';
-        ctx.lineWidth = 2.5;
-        ctx.beginPath();
-        ctx.ellipse(0, 0, 17, 13, 0, 0, Math.PI * 2);
+        ctx.roundRect(-14, -8, 26, 16, 8);
         ctx.fill();
         ctx.stroke();
 
         // Wing
-        const wingOffset = state === 'OVER' ? 0 : Math.sin(frames * 0.35) * 4;
-        ctx.fillStyle = '#fef08a';
+        const wingY = state === 'OVER' ? 0 : Math.sin(time * 22) * 2.2;
+        ctx.fillStyle = pal.wing;
         ctx.beginPath();
-        ctx.ellipse(-5, 2 + wingOffset, 8, 5, -0.2, 0, Math.PI * 2);
+        ctx.roundRect(-9, -2 + wingY, 11, 5.5, 2.75);
         ctx.fill();
-        ctx.stroke();
 
         // Eye
-        ctx.fillStyle = '#ffffff';
+        ctx.fillStyle = pal.birdStroke;
         ctx.beginPath();
-        ctx.arc(7, -4, 5, 0, Math.PI * 2);
-        ctx.fill();
-        ctx.stroke();
-
-        ctx.fillStyle = '#0f172a';
-        ctx.beginPath();
-        ctx.arc(8.5, -4, 2.2, 0, Math.PI * 2);
+        ctx.arc(5, -2, 1.8, 0, Math.PI * 2);
         ctx.fill();
 
         // Beak
-        ctx.fillStyle = '#f97316';
+        ctx.fillStyle = pal.accent;
         ctx.beginPath();
-        ctx.moveTo(14, -2);
-        ctx.lineTo(25, 2);
-        ctx.lineTo(14, 6);
+        ctx.moveTo(12, -3);
+        ctx.lineTo(18, 0);
+        ctx.lineTo(12, 3);
         ctx.closePath();
         ctx.fill();
-        ctx.stroke();
 
         ctx.restore();
       }
     };
 
-    const pipes = [];
-    const PIPE_W = 58;
-    const PIPE_GAP = 132;
-    const PIPE_SPEED = 2.65;
+    const pillars = [];
+    const particles = [];
+    const PILLAR_W = 46;
 
-    function resetGame() {
-      pipes.length = 0;
+    function spawnPillar(startX) {
+      const cfg = MODES[modeKey];
+      const margin = 52;
+      const maxTop = LOGICAL_H - margin - cfg.gap;
+      const topH = Math.floor(margin + Math.random() * (maxTop - margin));
+      pillars.push({
+        x: startX,
+        topH,
+        gap: cfg.gap,
+        passed: false
+      });
+    }
+
+    function startNewGame() {
+      pillars.length = 0;
       particles.length = 0;
       score = 0;
-      scoreEl.textContent = '0';
-      bird.reset();
-      state = 'PLAY';
-      bird.flap();
+      scoreEl.textContent = '00';
+      glider.reset();
+      const cfg = MODES[modeKey];
+      for (let i = 0; i < 4; i++) {
+        spawnPillar(440 + i * cfg.interval);
+      }
+      state = 'RUNNING';
+      fpsMeta.textContent = `60 FPS · ${modeKey}`;
+      glider.jump();
     }
 
-    function triggerGameOver() {
+    function endGame() {
+      if (state === 'OVER') return;
       state = 'OVER';
-      playSound('hit');
-      spawnParticles(bird.x, bird.y, '#ef4444', 18);
-      if (score > bestScore) {
-        bestScore = score;
-        localStorage.setItem('deniz_flappy_best', String(bestScore));
-        bestEl.textContent = bestScore;
+      shakeTime = 0.18;
+      playTone('crash');
+      fpsMeta.textContent = 'TERMINATED · PRESS SPACE';
+      if (score > best) {
+        best = score;
+        localStorage.setItem('deniz_flappy_clean_best', String(best));
+        bestEl.textContent = fmt(best);
       }
     }
 
-    const particles = [];
-    function spawnParticles(x, y, color, count) {
-      for (let i = 0; i < count; i++) {
-        particles.push({
-          x,
-          y,
-          vx: (Math.random() - 0.5) * 5,
-          vy: (Math.random() - 0.5) * 5,
-          life: 1,
-          color
-        });
-      }
-    }
+    function updateWorld(dt) {
+      if (state !== 'RUNNING') return;
+      const cfg = MODES[modeKey];
+      scrollX = (scrollX + cfg.speed * dt) % 40;
 
-    const stars = Array.from({ length: 28 }, () => ({
-      x: Math.random() * W,
-      y: Math.random() * (H - GROUND_H - 120),
-      r: Math.random() * 1.6 + 0.6,
-      phase: Math.random() * Math.PI * 2
-    }));
+      for (let i = pillars.length - 1; i >= 0; i--) {
+        const p = pillars[i];
+        p.x -= cfg.speed * dt;
 
-    function updatePipes() {
-      if (state !== 'PLAY') return;
+        // Collision box check (tight, fair hitbox)
+        const bx1 = glider.x - 11;
+        const bx2 = glider.x + 11;
+        const by1 = glider.y - 6;
+        const by2 = glider.y + 6;
 
-      if (frames % 92 === 0) {
-        const minTop = 55;
-        const maxTop = H - GROUND_H - PIPE_GAP - 65;
-        const topH = Math.floor(Math.random() * (maxTop - minTop + 1)) + minTop;
-        pipes.push({ x: W + 10, topH, passed: false });
-      }
-
-      for (let i = pipes.length - 1; i >= 0; i--) {
-        const p = pipes[i];
-        p.x -= PIPE_SPEED;
-
-        // Collision check
-        const withinX = bird.x + bird.radius - 3 > p.x && bird.x - bird.radius + 3 < p.x + PIPE_W;
-        const hitTop = bird.y - bird.radius + 3 < p.topH;
-        const hitBottom = bird.y + bird.radius - 3 > p.topH + PIPE_GAP;
-
-        if (withinX && (hitTop || hitBottom)) {
-          triggerGameOver();
+        if (bx2 > p.x && bx1 < p.x + PILLAR_W) {
+          if (by1 < p.topH || by2 > p.topH + p.gap) {
+            endGame();
+          }
         }
 
-        // Score check
-        if (!p.passed && p.x + PIPE_W < bird.x) {
+        // Score gate
+        if (!p.passed && p.x + PILLAR_W < glider.x) {
           p.passed = true;
           score++;
-          scoreEl.textContent = score;
-          playSound('score');
-          spawnParticles(bird.x, bird.y - 20, '#4ade80', 10);
+          scoreEl.textContent = fmt(score);
+          playTone('point');
         }
 
-        if (p.x + PIPE_W < -20) {
-          pipes.splice(i, 1);
+        if (p.x + PILLAR_W < -40) {
+          pillars.splice(i, 1);
+          const lastX = pillars.length ? pillars[pillars.length - 1].x : LOGICAL_W;
+          spawnPillar(lastX + cfg.interval);
         }
       }
-    }
 
-    function drawPipe(x, y, w, h, isTop) {
-      const grad = ctx.createLinearGradient(x, 0, x + w, 0);
-      grad.addColorStop(0, '#16a34a');
-      grad.addColorStop(0.3, '#4ade80');
-      grad.addColorStop(0.65, '#22c55e');
-      grad.addColorStop(1, '#14532d');
-
-      ctx.fillStyle = grad;
-      ctx.strokeStyle = '#052e16';
-      ctx.lineWidth = 2.5;
-      ctx.fillRect(x, y, w, h);
-      ctx.strokeRect(x, y, w, h);
-
-      // Pipe lip
-      const lipH = 22;
-      const lipY = isTop ? y + h - lipH : y;
-      ctx.fillRect(x - 4, lipY, w + 8, lipH);
-      ctx.strokeRect(x - 4, lipY, w + 8, lipH);
-    }
-
-    function drawBackground() {
-      const sky = ctx.createLinearGradient(0, 0, 0, H - GROUND_H);
-      sky.addColorStop(0, '#0f172a');
-      sky.addColorStop(0.6, '#1e293b');
-      sky.addColorStop(1, '#0284c7');
-      ctx.fillStyle = sky;
-      ctx.fillRect(0, 0, W, H - GROUND_H);
-
-      // Twinkling stars
-      stars.forEach(s => {
-        const alpha = 0.35 + 0.55 * Math.sin(frames * 0.04 + s.phase);
-        ctx.fillStyle = `rgba(248, 250, 252, ${alpha})`;
-        ctx.beginPath();
-        ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
-        ctx.fill();
-      });
-
-      // City silhouette
-      ctx.fillStyle = 'rgba(15, 23, 42, 0.45)';
-      for (let i = 0; i < 10; i++) {
-        const bh = 55 + ((i * 37) % 65);
-        ctx.fillRect(i * 44, H - GROUND_H - bh, 42, bh);
+      for (let i = particles.length - 1; i >= 0; i--) {
+        const pt = particles[i];
+        pt.x += pt.vx * dt;
+        pt.y += pt.vy * dt;
+        pt.life -= dt * 2.6;
+        if (pt.life <= 0) particles.splice(i, 1);
       }
     }
 
-    function drawGround() {
-      const gy = H - GROUND_H;
-      ctx.fillStyle = '#84cc16';
-      ctx.fillRect(0, gy, W, 14);
-
-      // Moving stripes
-      const offset = state === 'OVER' ? 0 : (frames * PIPE_SPEED) % 28;
-      ctx.fillStyle = '#65a30d';
-      for (let x = -28; x < W + 28; x += 28) {
-        ctx.beginPath();
-        ctx.moveTo(x - offset, gy + 2);
-        ctx.lineTo(x + 12 - offset, gy + 2);
-        ctx.lineTo(x + 4 - offset, gy + 12);
-        ctx.lineTo(x - 8 - offset, gy + 12);
-        ctx.closePath();
-        ctx.fill();
-      }
-
-      const dirt = ctx.createLinearGradient(0, gy + 14, 0, H);
-      dirt.addColorStop(0, '#d97706');
-      dirt.addColorStop(1, '#78350f');
-      ctx.fillStyle = dirt;
-      ctx.fillRect(0, gy + 14, W, GROUND_H - 14);
-
-      ctx.strokeStyle = '#052e16';
-      ctx.lineWidth = 3;
-      ctx.beginPath();
-      ctx.moveTo(0, gy);
-      ctx.lineTo(W, gy);
-      ctx.stroke();
-    }
-
-    function drawOverlay() {
-      if (state === 'PLAY') {
-        ctx.font = 'bold 42px Consolas, monospace';
-        ctx.textAlign = 'center';
-        ctx.fillStyle = 'rgba(0,0,0,0.4)';
-        ctx.fillText(score, W / 2 + 2, 68);
-        ctx.fillStyle = '#facc15';
-        ctx.fillText(score, W / 2, 65);
-        return;
-      }
-
-      ctx.fillStyle = 'rgba(9, 13, 22, 0.62)';
-      ctx.fillRect(0, 0, W, H - GROUND_H);
-
+    function drawStage(pal, time) {
       ctx.save();
-      ctx.fillStyle = 'rgba(15, 23, 42, 0.92)';
-      ctx.strokeStyle = '#38bdf8';
-      ctx.lineWidth = 2.5;
-      const boxW = 320, boxH = 220;
-      const bx = (W - boxW) / 2, by = (H - GROUND_H - boxH) / 2;
+      if (shakeTime > 0) {
+        const mag = shakeTime * 22;
+        ctx.translate((Math.random() - 0.5) * mag, (Math.random() - 0.5) * mag);
+      }
+
+      // Background
+      ctx.fillStyle = pal.bg;
+      ctx.fillRect(0, 0, LOGICAL_W, LOGICAL_H);
+
+      // Architectural Grid
+      ctx.strokeStyle = pal.grid;
+      ctx.lineWidth = 1;
       ctx.beginPath();
-      ctx.roundRect(bx, by, boxW, boxH, 16);
-      ctx.fill();
+      for (let x = -scrollX; x < LOGICAL_W; x += 40) {
+        ctx.moveTo(x, 0);
+        ctx.lineTo(x, LOGICAL_H);
+      }
+      for (let y = 0; y < LOGICAL_H; y += 40) {
+        ctx.moveTo(0, y);
+        ctx.lineTo(LOGICAL_W, y);
+      }
       ctx.stroke();
 
-      ctx.textAlign = 'center';
-      if (state === 'START') {
-        ctx.fillStyle = '#facc15';
-        ctx.font = 'bold 26px Segoe UI, sans-serif';
-        ctx.fillText('FLAPPY CODER 🐦', W / 2, by + 55);
+      // Horizon Line
+      ctx.strokeStyle = pal.horizon;
+      ctx.beginPath();
+      ctx.moveTo(0, LOGICAL_H - 65);
+      ctx.lineTo(LOGICAL_W, LOGICAL_H - 65);
+      ctx.stroke();
 
-        ctx.fillStyle = '#cbd5e1';
-        ctx.font = '15px Segoe UI, sans-serif';
-        ctx.fillText('Boruların arasından süzülerek', W / 2, by + 95);
-        ctx.fillText('en yüksek skoru yap!', W / 2, by + 118);
+      // Pillars
+      pillars.forEach(p => {
+        const botY = p.topH + p.gap;
+        const botH = LOGICAL_H - botY;
 
-        ctx.fillStyle = '#38bdf8';
-        ctx.font = 'bold 17px Consolas, monospace';
-        ctx.fillText('▶ BAŞLAMAK İÇİN TIKLA / SPACE', W / 2, by + 172);
-      } else if (state === 'OVER') {
-        ctx.fillStyle = '#ef4444';
-        ctx.font = 'bold 28px Segoe UI, sans-serif';
-        ctx.fillText('OYUN BİTTİ!', W / 2, by + 50);
+        // Dashed gate line
+        ctx.strokeStyle = pal.guide;
+        ctx.setLineDash([3, 3]);
+        ctx.beginPath();
+        ctx.moveTo(p.x + PILLAR_W / 2, p.topH);
+        ctx.lineTo(p.x + PILLAR_W / 2, botY);
+        ctx.stroke();
+        ctx.setLineDash([]);
 
-        ctx.fillStyle = '#f8fafc';
-        ctx.font = 'bold 18px Consolas, monospace';
-        ctx.fillText(`SKORUN: ${score}`, W / 2, by + 95);
+        // Top column
+        ctx.fillStyle = pal.pillarFill;
+        ctx.strokeStyle = pal.pillarStroke;
+        ctx.lineWidth = 1;
+        ctx.fillRect(p.x, -1, PILLAR_W, p.topH + 1);
+        ctx.strokeRect(p.x, -1, PILLAR_W, p.topH + 1);
 
-        ctx.fillStyle = '#facc15';
-        ctx.fillText(`EN İYİ SKOR: ${bestScore}`, W / 2, by + 125);
+        // Top cap
+        ctx.fillStyle = pal.pillarCap;
+        ctx.fillRect(p.x - 3, p.topH - 6, PILLAR_W + 6, 6);
+        ctx.strokeRect(p.x - 3, p.topH - 6, PILLAR_W + 6, 6);
 
-        ctx.fillStyle = '#4ade80';
-        ctx.font = 'bold 16px Consolas, monospace';
-        ctx.fillText('↻ TEKRAR OYNAMAK İÇİN TIKLA', W / 2, by + 178);
-      }
-      ctx.restore();
-    }
+        // Bottom column
+        ctx.fillStyle = pal.pillarFill;
+        ctx.fillRect(p.x, botY, PILLAR_W, botH + 1);
+        ctx.strokeRect(p.x, botY, PILLAR_W, botH + 1);
 
-    function handleAction(e) {
-      if (e) e.preventDefault();
-      if (state === 'START' || state === 'OVER') {
-        resetGame();
-      } else if (state === 'PLAY') {
-        bird.flap();
-      }
-    }
-
-    window.addEventListener('keydown', e => {
-      if (e.code === 'Space' || e.code === 'ArrowUp' || e.code === 'KeyW') {
-        handleAction(e);
-      }
-    });
-    canvas.addEventListener('pointerdown', handleAction);
-
-    function loop() {
-      frames++;
-      bird.update();
-      updatePipes();
-
-      drawBackground();
-      pipes.forEach(p => {
-        drawPipe(p.x, 0, PIPE_W, p.topH, true);
-        const botY = p.topH + PIPE_GAP;
-        drawPipe(p.x, botY, PIPE_W, H - GROUND_H - botY, false);
+        // Bottom cap
+        ctx.fillStyle = pal.pillarCap;
+        ctx.fillRect(p.x - 3, botY, PILLAR_W + 6, 6);
+        ctx.strokeRect(p.x - 3, botY, PILLAR_W + 6, 6);
       });
 
       // Particles
-      for (let i = particles.length - 1; i >= 0; i--) {
-        const pt = particles[i];
-        pt.x += pt.vx;
-        pt.y += pt.vy;
-        pt.life -= 0.04;
-        if (pt.life <= 0) {
-          particles.splice(i, 1);
-          continue;
-        }
-        ctx.fillStyle = pt.color;
-        ctx.globalAlpha = pt.life;
+      particles.forEach(pt => {
+        ctx.fillStyle = pal.muted;
+        ctx.globalAlpha = Math.max(0, pt.life * 0.6);
         ctx.beginPath();
-        ctx.arc(pt.x, pt.y, 3, 0, Math.PI * 2);
+        ctx.arc(pt.x, pt.y, 1.8, 0, Math.PI * 2);
         ctx.fill();
-        ctx.globalAlpha = 1;
+      });
+      ctx.globalAlpha = 1;
+
+      // Glider
+      glider.draw(pal, time);
+
+      // Minimal HUD Modal when IDLE, PAUSED, or OVER
+      if (state !== 'RUNNING') {
+        ctx.fillStyle = pal.overlay;
+        ctx.fillRect(0, 0, LOGICAL_W, LOGICAL_H);
+
+        const mw = 320;
+        const mh = 156;
+        const mx = (LOGICAL_W - mw) / 2;
+        const my = (LOGICAL_H - mh) / 2;
+
+        ctx.fillStyle = pal.card;
+        ctx.strokeStyle = pal.pillarStroke;
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        ctx.roundRect(mx, my, mw, mh, 8);
+        ctx.fill();
+        ctx.stroke();
+
+        ctx.textAlign = 'center';
+        if (state === 'IDLE') {
+          ctx.fillStyle = pal.text;
+          ctx.font = '600 15px -apple-system, BlinkMacSystemFont, "Inter", sans-serif';
+          ctx.fillText('Interactive Flight Simulation', LOGICAL_W / 2, my + 44);
+
+          ctx.fillStyle = pal.muted;
+          ctx.font = '12px "JetBrains Mono", Consolas, monospace';
+          ctx.fillText('Navigate through the structural gaps.', LOGICAL_W / 2, my + 74);
+
+          ctx.fillStyle = pal.text;
+          ctx.font = '500 12px "JetBrains Mono", Consolas, monospace';
+          ctx.fillText('[ Press SPACE or Click to start ]', LOGICAL_W / 2, my + 118);
+        } else if (state === 'PAUSED') {
+          ctx.fillStyle = pal.text;
+          ctx.font = '600 15px -apple-system, BlinkMacSystemFont, "Inter", sans-serif';
+          ctx.fillText('Simulation Paused', LOGICAL_W / 2, my + 58);
+
+          ctx.fillStyle = pal.muted;
+          ctx.font = '12px "JetBrains Mono", Consolas, monospace';
+          ctx.fillText('[ Press P or SPACE to resume ]', LOGICAL_W / 2, my + 102);
+        } else if (state === 'OVER') {
+          ctx.fillStyle = pal.text;
+          ctx.font = '600 15px -apple-system, BlinkMacSystemFont, "Inter", sans-serif';
+          ctx.fillText('Run Terminated', LOGICAL_W / 2, my + 42);
+
+          ctx.fillStyle = pal.muted;
+          ctx.font = '12px "JetBrains Mono", Consolas, monospace';
+          ctx.fillText(`SCORE ${fmt(score)}   ·   BEST ${fmt(best)}`, LOGICAL_W / 2, my + 76);
+
+          ctx.fillStyle = pal.text;
+          ctx.font = '500 12px "JetBrains Mono", Consolas, monospace';
+          ctx.fillText('[ Press SPACE or Click to retry ]', LOGICAL_W / 2, my + 118);
+        }
       }
 
-      drawGround();
-      bird.draw();
-      drawOverlay();
-
-      requestAnimationFrame(loop);
+      ctx.restore();
     }
 
-    loop();
+    function triggerPrimaryAction(e) {
+      if (e) e.preventDefault();
+      if (state === 'IDLE' || state === 'OVER') {
+        startNewGame();
+      } else if (state === 'PAUSED') {
+        state = 'RUNNING';
+        fpsMeta.textContent = `60 FPS · ${modeKey}`;
+      } else if (state === 'RUNNING') {
+        glider.jump();
+      }
+    }
+
+    canvas.addEventListener('pointerdown', triggerPrimaryAction);
+
+    window.addEventListener('keydown', e => {
+      if (e.code === 'Space' || e.code === 'ArrowUp' || e.code === 'KeyW') {
+        triggerPrimaryAction(e);
+      } else if (e.code === 'KeyP' || e.code === 'Escape') {
+        if (state === 'RUNNING') {
+          state = 'PAUSED';
+          fpsMeta.textContent = 'PAUSED';
+        } else if (state === 'PAUSED') {
+          state = 'RUNNING';
+          fpsMeta.textContent = `60 FPS · ${modeKey}`;
+        }
+      } else if (e.code === 'KeyM') {
+        soundBtn.click();
+      } else if (e.code === 'KeyT') {
+        themeBtn.click();
+      }
+    });
+
+    modeBtn.addEventListener('click', () => {
+      modeKey = modeKey === 'NORMAL' ? 'FAST' : 'NORMAL';
+      modeBtn.textContent = `MODE: ${modeKey}`;
+      if (state === 'RUNNING') startNewGame();
+    });
+
+    soundBtn.addEventListener('click', () => {
+      soundEnabled = !soundEnabled;
+      soundBtn.textContent = `AUDIO: ${soundEnabled ? 'ON' : 'OFF'}`;
+    });
+
+    themeBtn.addEventListener('click', () => {
+      currentTheme = currentTheme === 'dark' ? 'paper' : 'dark';
+      document.documentElement.setAttribute('data-theme', currentTheme);
+      localStorage.setItem('flappy_theme', currentTheme);
+    });
+
+    let lastTime = performance.now();
+    function frame(now) {
+      const dt = Math.min(0.033, (now - lastTime) / 1000);
+      lastTime = now;
+      const elapsed = now / 1000;
+
+      if (shakeTime > 0) shakeTime = Math.max(0, shakeTime - dt);
+
+      if (state !== 'PAUSED') {
+        glider.update(dt, elapsed);
+        updateWorld(dt);
+      }
+
+      drawStage(PALETTES[currentTheme], elapsed);
+      requestAnimationFrame(frame);
+    }
+
+    requestAnimationFrame(frame);
   </script>
 </body>
 </html>
